@@ -4,7 +4,7 @@
  *  It uses libraries like `crypto-js` to create the hashes for each block and `bitcoinjs-message` 
  *  to verify a message signature. The chain is stored in the array
  *  `this.chain = [];`. Of course each time you run the application the chain will be empty because and array
- *  isn't a persisten storage method.
+ *  isn't a persistent storage method.
  *  
  */
 
@@ -17,7 +17,7 @@ class Blockchain {
     /**
      * Constructor of the class, you will need to setup your chain array and the height
      * of your chain (the length of your chain array).
-     * Also everytime you create a Blockchain class you will need to initialized the chain creating
+     * Also every time you create a Blockchain class you will need to initialized the chain creating
      * the Genesis Block.
      * The methods in this class will always return a Promise to allow client applications or
      * other backends to call asynchronous functions.
@@ -34,8 +34,8 @@ class Blockchain {
      * Passing as a data `{data: 'Genesis Block'}`
      */
     async initializeChain() {
-        if( this.height === -1){
-            let block = new BlockClass.Block({data: 'Genesis Block'});
+        if (this.height === -1) {
+            let block = new BlockClass.Block({ data: 'Genesis Block' });
             await this._addBlock(block);
         }
     }
@@ -64,8 +64,30 @@ class Blockchain {
     _addBlock(block) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-           
+            let chainHeight = self.getChainHeight();
+            const previousBlock = self.chain[chainHeight - 1];
+
+            // Setting block properties
+            block.previousBlockHash = previousBlock ? previousBlock.hash : null;
+            block.height = height;
+            block.time = new Date().getTime().toString().slice(0, -3);
+            block.hash = await SHA256(JSON.stringify(block)).toString();
+
+            if (self._isBlockValid(block)) {
+                resolve(block)
+            } else {
+                reject(new Error('Cannot add invalid block.'))
+            }
         });
+    }
+
+    /**
+     * _isBlockValid(block) will store a block in the chain
+     * @param {*} block 
+     * @returns boolean
+     */
+    _isBlockValid(block) {
+        return block.hash && (block.hash.length === 64) && (block.height === self.chain.length) && block.time;
     }
 
     /**
@@ -78,7 +100,7 @@ class Blockchain {
      */
     requestMessageOwnershipVerification(address) {
         return new Promise((resolve) => {
-            
+
         });
     }
 
@@ -102,7 +124,7 @@ class Blockchain {
     submitStar(address, message, signature, star) {
         let self = this;
         return new Promise(async (resolve, reject) => {
-            
+
         });
     }
 
@@ -115,7 +137,7 @@ class Blockchain {
     getBlockByHash(hash) {
         let self = this;
         return new Promise((resolve, reject) => {
-           
+
         });
     }
 
@@ -128,7 +150,7 @@ class Blockchain {
         let self = this;
         return new Promise((resolve, reject) => {
             let block = self.chain.filter(p => p.height === height)[0];
-            if(block){
+            if (block) {
                 resolve(block);
             } else {
                 resolve(null);
@@ -142,11 +164,11 @@ class Blockchain {
      * Remember the star should be returned decoded.
      * @param {*} address 
      */
-    getStarsByWalletAddress (address) {
+    getStarsByWalletAddress(address) {
         let self = this;
         let stars = [];
         return new Promise((resolve, reject) => {
-            
+
         });
     }
 
@@ -160,10 +182,10 @@ class Blockchain {
         let self = this;
         let errorLog = [];
         return new Promise(async (resolve, reject) => {
-            
+
         });
     }
 
 }
 
-module.exports.Blockchain = Blockchain;   
+module.exports.Blockchain = Blockchain;
