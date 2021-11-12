@@ -11,6 +11,7 @@
 const SHA256 = require('crypto-js/sha256');
 const BlockClass = require('./block.js');
 const bitcoinMessage = require('bitcoinjs-message');
+const hex2ascii = require('hex2ascii');
 
 class Blockchain {
 
@@ -63,6 +64,7 @@ class Blockchain {
      */
     _addBlock(block) {
         let self = this;
+
         return new Promise(async (resolve, reject) => {
             let chainHeight = self.getChainHeight();
             const previousBlock = self.chain[chainHeight - 1];
@@ -73,6 +75,7 @@ class Blockchain {
             block.time = new Date().getTime().toString().slice(0, -3);
             block.hash = await SHA256(JSON.stringify(block)).toString();
 
+            // Validate if block is valid
             if (self._isBlockValid(block)) {
                 resolve(block)
             } else {
@@ -99,8 +102,10 @@ class Blockchain {
      * @param {*} address 
      */
     requestMessageOwnershipVerification(address) {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
+            let unsignedMessage = `{$address}: ${new Date().getTime().toString.slice(0, -3)}: startRegistry`;
 
+            resolve(unsignedMessage);
         });
     }
 
@@ -113,7 +118,7 @@ class Blockchain {
      * 1. Get the time from the message sent as a parameter example: `parseInt(message.split(':')[1])`
      * 2. Get the current time: `let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));`
      * 3. Check if the time elapsed is less than 5 minutes
-     * 4. Veify the message with wallet address and signature: `bitcoinMessage.verify(message, address, signature)`
+     * 4. Verify the message with wallet address and signature: `bitcoinMessage.verify(message, address, signature)`
      * 5. Create the block and add it to the chain
      * 6. Resolve with the block added.
      * @param {*} address 
@@ -123,8 +128,24 @@ class Blockchain {
      */
     submitStar(address, message, signature, star) {
         let self = this;
-        return new Promise(async (resolve, reject) => {
 
+        return new Promise(async (resolve, reject) => {
+            let requestTime = parseInt(message.split(':')[1]);
+            let currentTime = parseInt(new Date.getTime().toString().slice(0, -3));
+            let block = new BlockClass.Block({ star });
+
+            const spendTime = currentTime - requestTime;
+
+            if (spendTime >= (5 * 60))
+                reject(new Error('Request time out.'))
+
+            if (!bitcoinMessage.verify(message, address, signature))
+                reject(nerError('Invalid message.'))
+
+            block.owner = address;
+            block = await self._addBlock(block);
+
+            resolve(block);
         });
     }
 
@@ -136,8 +157,15 @@ class Blockchain {
      */
     getBlockByHash(hash) {
         let self = this;
-        return new Promise((resolve, reject) => {
 
+        return new Promise((resolve, reject) => {
+            let block = self.chain.filter(block => block.hash === hash)[0];
+
+            if (block) {
+                resolve(block);
+            } else {
+                reject(new Error('Cannot get block by hash.'));
+            }
         });
     }
 
@@ -149,11 +177,11 @@ class Blockchain {
     getBlockByHeight(height) {
         let self = this;
         return new Promise((resolve, reject) => {
-            let block = self.chain.filter(p => p.height === height)[0];
+            let block = self.chain.filter(block => block.height === height)[0];
             if (block) {
                 resolve(block);
             } else {
-                resolve(null);
+                reject(new Error('Cannot get block by height.'));
             }
         });
     }
@@ -167,8 +195,28 @@ class Blockchain {
     getStarsByWalletAddress(address) {
         let self = this;
         let stars = [];
-        return new Promise((resolve, reject) => {
 
+        // validate chain
+        this.validateChain()
+            .then(errors => {
+                typeof errors === 'string'
+                    ? console.log('✔️ Success', errors)
+                    : errors.forEach(error => console.log('❌ Error', error))
+            })
+
+        return new Promise((resolve, reject) => {
+            let ownedBlocks = self.chain.filter(block => block.owner === address);
+
+            if (ownedBlocks.length === 0)
+                reject(new Error('Address not found.'))
+
+            stars = ownedBlocks.map(block => JSON.parse(hex2ascii(block.body)));
+
+            if (stars) {
+                resolve(stars)
+            } else {
+                reject(new Error('Cannot get stars.'))
+            }
         });
     }
 
