@@ -71,16 +71,18 @@ class Blockchain {
 
             // Setting block properties
             block.previousBlockHash = previousBlock ? previousBlock.hash : null;
-            block.height = height;
+            block.height = chainHeight;
             block.time = new Date().getTime().toString().slice(0, -3);
             block.hash = await SHA256(JSON.stringify(block)).toString();
 
             // Validate if block is valid
             if (self._isBlockValid(block)) {
                 resolve(block)
-            } else {
-                reject(new Error('Cannot add invalid block.'))
             }
+
+            // else {
+            //     reject(new Error('Cannot add invalid block.'))
+            // }
         });
     }
 
@@ -90,6 +92,8 @@ class Blockchain {
      * @returns boolean
      */
     _isBlockValid(block) {
+        let self = this;
+
         return block.hash && (block.hash.length === 64) && (block.height === self.chain.length) && block.time;
     }
 
@@ -229,11 +233,30 @@ class Blockchain {
     validateChain() {
         let self = this;
         let errorLog = [];
-        return new Promise(async (resolve, reject) => {
 
+        return new Promise(async (resolve, reject) => {
+            for (let block of self.chain) {
+                const validatedBlock = await block.validate();
+
+                if (validatedBlock) {
+                    if (validatedBlock.height > 0) {
+                        let previousBlock = self.chain.filter(block => block.height - 1)[0];
+
+                        if (validatedBlock.previousBlockHash !== previousBlock.hash)
+                            errorLog.push(new Error(`Invalid link: Block #${validatedBlock.height} not linked to the hash of block #${validatedBlock.height - 1}.`));
+                    }
+                } else {
+                    errorLog.push(new Error(`Invalid block #${validatedBlock.height} with hash ${validatedBlock.hash}`))
+                }
+            }
+
+            if (errorLog.length > 0) {
+                resolve(errorLog);
+            } else {
+                resolve('No errors detected')
+            }
         });
     }
-
 }
 
 module.exports.Blockchain = Blockchain;
