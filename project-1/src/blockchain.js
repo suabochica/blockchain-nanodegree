@@ -14,7 +14,6 @@ const bitcoinMessage = require('bitcoinjs-message');
 const hex2ascii = require('hex2ascii');
 
 class Blockchain {
-
     /**
      * Constructor of the class, you will need to setup your chain array and the height
      * of your chain (the length of your chain array).
@@ -66,7 +65,7 @@ class Blockchain {
         let self = this;
 
         return new Promise(async (resolve, reject) => {
-            let chainHeight = self.getChainHeight();
+            let chainHeight = self.chain.length;
             const previousBlock = self.chain[chainHeight - 1];
 
             // Setting block properties
@@ -78,12 +77,17 @@ class Blockchain {
             // Validate if block is valid
             if (self._isBlockValid(block)) {
                 resolve(block)
+            } else {
+                reject(new Error('Cannot add invalid block.'))
             }
+        })
+            .catch(error => console.log('❌ Error', error))
+            .then(block => {
+                this.chain.push(block);
+                this.height = this.chain.length - 1;
 
-            // else {
-            //     reject(new Error('Cannot add invalid block.'))
-            // }
-        });
+                return block
+            });
     }
 
     /**
@@ -107,7 +111,7 @@ class Blockchain {
      */
     requestMessageOwnershipVerification(address) {
         return new Promise((resolve, reject) => {
-            let unsignedMessage = `{$address}: ${new Date().getTime().toString.slice(0, -3)}: startRegistry`;
+            let unsignedMessage = `${address}:${new Date().getTime().toString().slice(0, -3)}:starRegistry`;
 
             resolve(unsignedMessage);
         });
@@ -135,7 +139,7 @@ class Blockchain {
 
         return new Promise(async (resolve, reject) => {
             let requestTime = parseInt(message.split(':')[1]);
-            let currentTime = parseInt(new Date.getTime().toString().slice(0, -3));
+            let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
             let block = new BlockClass.Block({ star });
 
             const spendTime = currentTime - requestTime;
@@ -144,7 +148,7 @@ class Blockchain {
                 reject(new Error('Request time out.'))
 
             if (!bitcoinMessage.verify(message, address, signature))
-                reject(nerError('Invalid message.'))
+                reject(new Error('Invalid message.'))
 
             block.owner = address;
             block = await self._addBlock(block);
@@ -204,9 +208,9 @@ class Blockchain {
         this.validateChain()
             .then(errors => {
                 typeof errors === 'string'
-                    ? console.log('✔️ Success', errors)
-                    : errors.forEach(error => console.log('❌ Error', error))
-            })
+                    ? console.log('✔️  Success', errors)
+                    : errors.forEach(error => console.log('❌  Error', error))
+            });
 
         return new Promise((resolve, reject) => {
             let ownedBlocks = self.chain.filter(block => block.owner === address);

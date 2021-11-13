@@ -7,6 +7,10 @@
  *  the data should be stored encoded.
  *  All the exposed methods should return a Promise to allow all the methods 
  *  run asynchronous.
+ * 
+ *  Wallet Address: bc1qm3ccsn5369wmhhu40sr34vtcwgv6axa09zkmnz
+ *  Message: bc1qm3ccsn5369wmhhu40sr34vtcwgv6axa09zkmnz:1636841187:starRegistry
+ *  Signature: IBvRMyXqQ0wxF1E+8tZVXgF7KsHMsIlVyDOENgHwejQFLFzP4IBrz60lxGRt7P4cpgmuxDFnTxE1qXuHrKXmAfw=
  */
 
 const SHA256 = require('crypto-js/sha256');
@@ -51,7 +55,6 @@ class Block {
             else {
                 // Returning the Block is not valid
                 resolve(false);
-                reject(Error('Block is not valid'));
             }
         });
     }

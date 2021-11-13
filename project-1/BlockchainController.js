@@ -5,7 +5,6 @@
  * Blockchain dataset
  */
 class BlockchainController {
-
     //The constructor receive the instance of the express.js app and the Blockchain class
     constructor(app, blockchainObj) {
         this.app = app;
@@ -55,7 +54,7 @@ class BlockchainController {
 
     // Endpoint that allow Submit a Star, yu need first to `requestOwnership` to have the message (POST endpoint)
     submitStar() {
-        this.app.post("/submitstar", async (req, res) => {
+        this.app.post("/submitStar", async (req, res) => {
             if (req.body.address && req.body.message && req.body.signature && req.body.star) {
                 const address = req.body.address;
                 const message = req.body.message;
