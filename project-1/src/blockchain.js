@@ -68,6 +68,14 @@ class Blockchain {
             let chainHeight = self.chain.length;
             const previousBlock = self.chain[chainHeight - 1];
 
+            // validate chain
+            this.validateChain()
+                .then(errors => {
+                    typeof errors === 'string'
+                        ? console.log('✔️  Success', errors)
+                        : errors.forEach(error => console.log('❌  Error', error))
+                });
+
             // Setting block properties
             block.previousBlockHash = previousBlock ? previousBlock.hash : null;
             block.height = chainHeight;
