@@ -89,7 +89,7 @@ class Blockchain {
                 // validate chain
                 let validateChain = await self.validateChain();
 
-                if (validateChain) {
+                if (validateChain.length > 0) {
                     resolve(block);
                 } else {
                     reject(new Error('Cannot validate chain.'))
@@ -161,18 +161,19 @@ class Blockchain {
             let requestTime = parseInt(message.split(':')[1]);
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
 
-            if (requestTime + 300 < currentTime)
-                reject(new Error('Request time out.'))
-
-            if (bitcoinMessage.verify(message, address, signature)) {
-                let block = new BlockClass.Block({
-                    data: { address, message, star }
-                });
-
-                await self._addBlock(block);
-                resolve(block);
+            if (requestTime + 300 < currentTime) {
+                return reject(new Error('Request time out.'))
             } else {
-                reject(new Error('Invalid message.'))
+                if (bitcoinMessage.verify(message, address, signature)) {
+                    let block = new BlockClass.Block({
+                        data: { address, message, star }
+                    });
+
+                    await self._addBlock(block);
+                    resolve(block);
+                } else {
+                    reject(new Error('Invalid message.'))
+                }
             }
         });
     }
