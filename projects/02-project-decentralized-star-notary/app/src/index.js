@@ -6,7 +6,7 @@ const App = {
   account: null,
   meta: null,
 
-  start: async function() {
+  start: async function () {
     const { web3 } = this;
 
     try {
@@ -26,29 +26,53 @@ const App = {
     }
   },
 
-  setStatus: function(message) {
+  setStatus: function (message) {
     const status = document.getElementById("status");
     status.innerHTML = message;
   },
 
-  createStar: async function() {
+  createStar: async function () {
     const { createStar } = this.meta.methods;
     const name = document.getElementById("starName").value;
     const id = document.getElementById("starId").value;
-    await createStar(name, id).send({from: this.account});
+    await createStar(name, id).send({ from: this.account });
     App.setStatus("New Star Owner is " + this.account + ".");
   },
 
-  // Implement Task 4 Modify the front end of the DAPP
-  lookUp: async function (){
-    
+  // TODO: Implement Task 4 Modify the front end of the DAPP
+  lookUp: async function () {
+    let {
+      name,
+      symbol,
+      ownerOf,
+      lookUpTokenIdToStarInfo,
+    } = this.meta.methods;
+    let lookUpId = document.getElementById("lookUpId").value;
+    lookUpId = parseInt(id);
+
+    let contractName = await name().call;
+    let contractSymbol = await symbol().call;
+    let contractStar = await lookUpTokenIdToStarInfo().call;
+    let contractOwner = await ownerOf().call;
+
+    if (contractStar.length === 0) {
+      App.setStatus(`Star not owned`);
+    } else {
+      App.setStatus(
+        `Start owner is ${contractOwner} \n
+        Start id is ${lookUpId} \n
+        Token name is ${contractName} \n
+        Token symbol is ${contractSymbol} \n
+        `
+      );
+    }
   }
 
 };
 
 window.App = App;
 
-window.addEventListener("load", async function() {
+window.addEventListener("load", async function () {
   if (window.ethereum) {
     // use MetaMask's provider
     App.web3 = new Web3(window.ethereum);
