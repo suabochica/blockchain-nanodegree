@@ -1,10 +1,10 @@
 pragma solidity >=0.4.24;
 
 //Importing openzeppelin-solidity ERC-721 implemented Standard
-import "../node_modules/openzeppelin-solidity/contracts/token/ERC721/ERC721.sol";
+import "../node_modules/openzeppelin-solidity/contracts/token/ERC721/ERC721Full.sol";
 
 // StarNotary Contract declaration inheritance the ERC721 openzeppelin implementation
-contract StarNotary is ERC721 {
+contract StarNotary is ERC721Full {
     // Star data
 
     // Implement Task 1 Add a name and symbol properties
@@ -19,7 +19,7 @@ contract StarNotary is ERC721 {
     // mapping the TokenId and price
     mapping(uint256 => uint256) public starsForSale;
 
-    constructor() public ERC721("Decentralized Start Token", "DST") {}
+    constructor() public ERC721Full("Decentralized Start Token", "DST") {}
 
     // Create Star using the Struct
     // Passing the name and tokenId as a parameters
@@ -60,7 +60,7 @@ contract StarNotary is ERC721 {
     }
 
     // TODO: Implement Task 1 lookUptokenIdToStarInfo
-    function lookUptokenIdToStarInfo(uint256 _tokenId)
+    function lookUpTokenIdToStarInfo(uint256 _tokenId)
         public
         view
         returns (string memory)
