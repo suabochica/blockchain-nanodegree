@@ -74,7 +74,6 @@ it('lets user2 buy a star and decreases its balance in ether', async () => {
     assert.equal(value, starPrice);
 });
 
-// TODO: Implement Task 2 Add supporting unit tests
 it('lets look up token id via star name', async () => {
     // 1. Create a Star with different tokenId
     let instance = await StarNotary.deployed();

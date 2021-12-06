@@ -39,7 +39,6 @@ const App = {
     App.setStatus("New Star Owner is " + this.account + ".");
   },
 
-  // TODO: Implement Task 4 Modify the front end of the DAPP
   lookUp: async function () {
     let {
       name,
@@ -58,13 +57,12 @@ const App = {
     if (contractStar.length === 0) {
       App.setStatus(`Star not owned`);
     } else {
-      App.setStatus(
-        `Start owner is ${contractOwner} \n
+      App.setStatus(`
+        Start owner is ${contractOwner} \n
         Start id is ${lookUpId} \n
         Token name is ${contractName} \n
         Token symbol is ${contractSymbol} \n
-        `
-      );
+      `);
     }
   }
 
