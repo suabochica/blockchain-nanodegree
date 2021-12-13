@@ -5,6 +5,7 @@ Monorepo to store the projects an examples explained in the [Udacity Nanodegree 
 ## 📁 Folder Structure
 
 - `/examples`: folder to store the examples offered as guides in the program
+- `/exercises`: folder to store the exercise requested in the program
 - `/projects`: folder to store the project required to pass the program
 
 ## 🗒️ Content
