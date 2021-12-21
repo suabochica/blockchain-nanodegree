@@ -28,7 +28,7 @@ npm -v
 2. **Truffle v5.X.X** - A development framework for Ethereum. 
 
 ```bash
-# Unsinstall any previous version
+# Uninstall any previous version
 npm uninstall -g truffle
 # Install
 npm install -g truffle

@@ -9,3 +9,10 @@ For this project you will creating a DApp supply chain solution backed by the Et
  - [ ] Deploy smart contracts on public test network (Rinkeby)
  - [ ] Modify client code to interact with smart contracts
  - [ ] (Optional) Implement infura to store product image
+
+ ## 🧰 Tech Stack
+- Truffle v5.4.23 (core: 5.4.23)
+- Solidity v0.5.16 (solc-js)
+- Node v14.15.4
+- Web3.js v1.5.3
+
