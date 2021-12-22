@@ -1,26 +1,11 @@
-pragma solidity >= 0.5.4;
+pragma solidity >=0.5.4;
 
-//----------------------------------
-// Imports
-//----------------------------------
-// TODO: Define the access roles and import them
-
-contract SupplyChain {
+contract Juice {
     //----------------------------------
     // Variables
     //----------------------------------
 
-    uint256 skuCounter;
-    mapping(uint256 => ChontaduroItem) chontaduroItems;
-    mapping(uint256 => JuiceItem) juiceItems;
-    mapping(uint256 => uint256[]) juiceChontaduros;
-    enum ChontaduroState {
-        Planted,
-        Harvested,
-        Audited,
-        Processed
-    }
-    ChontaduroState constant defaultChontaduroState = ChontaduroState.Planted;
+    uint256 skuCount;
     enum JuiceState {
         Created,
         Blended,
@@ -29,20 +14,6 @@ contract SupplyChain {
         Packed,
         ReadyForSale,
         Sold
-    }
-    JuiceState constant defaultJuiceState = JuiceState.Created;
-    struct ChontaduroItem {
-        uint256 sku;
-        uint256 upc;
-        address originFarmerId;
-        address ownerId;
-        string originFarmerInformation;
-        string originFarmerLatitude;
-        string originFarmerLongitude;
-        string originFarmerName;
-        string auditNotes;
-        string harvestNotes;
-        ChontaduroState itemStae;
     }
     struct JuiceItem {
         uint256 sku;
@@ -57,15 +28,12 @@ contract SupplyChain {
         string productNotes;
         JuiceState itemStae;
     }
+    JuiceState constant defaultJuiceState = JuiceState.Created;
+    mapping(uint256 => JuiceItem) juiceItems;
 
     //----------------------------------
     // Events
     //----------------------------------
-
-    event ChontaduroPlanted(uint256 chontaduroUpc);
-    event ChontaduroHarvested(uint256 chontaduroUpc);
-    event ChontaduroAudited(uint256 chontaduroUpc);
-    event ChontaduroProcessed(uint256 chontaduroUpc);
 
     event JuiceCreated(uint256 juiceUpc);
     event JuiceBlended(uint256 juiceUpc);
@@ -90,28 +58,6 @@ contract SupplyChain {
     modifier checkValue(uint256 _juiceUpc) {
         _;
     }
-
-    // Chontaduro Modifiers
-    //----------------------------------
-
-    modifier isPlanted(uint256 _chontaduroUpc) {
-        _;
-    }
-
-    modifier isHarvested(uint256 _chontaduroUpc) {
-        _;
-    }
-
-    modifier isAudited(uint256 _chontaduroUpc) {
-        _;
-    }
-
-    modifier isProcessed(uint256 _chontaduroUpc) {
-        _;
-    }
-
-    // Juice Modifiers
-    //----------------------------------
 
     modifier isCreated(uint256 _juiceUpc) {
         _;
@@ -144,31 +90,12 @@ contract SupplyChain {
     //----------------------------------
     // Constructor
     //----------------------------------
-
     constructor() public payable {
-        skuCounter = 1;
+        skuCount = 0;
     }
 
     //----------------------------------
     // Functions
-    //----------------------------------
-
-    function kill() public onlyOwner {}
-
-    // Chontaduro Functions
-    //----------------------------------
-
-    function chontaduroPlantItem() public {}
-
-    function chontaduroHarvestItem() public {}
-
-    function chontaduroAuditItem() public {}
-
-    function chontaduroProcessItem() public {}
-
-    function fetchChontaduroItem() public {}
-
-    // Juice Functions
     //----------------------------------
 
     function juiceCeratetItem() public {}

@@ -1,30 +1,33 @@
-pragma solidity ^0.5.4;
+pragma solidity >=0.5.4;
 
 contract LemonadeStand {
-
     //----------------------------------
     // Variables
     //----------------------------------
     address owner;
-    uint skuCount;
-    enum State { ForSale, Sold, Shipped }
+    uint256 skuCount;
+    enum State {
+        ForSale,
+        Sold,
+        Shipped
+    }
     struct Item {
         string name;
-        uint sku;
-        uint price;
+        uint256 sku;
+        uint256 price;
         State state;
         address seller;
         address buyer;
     }
-    mapping (uint => Item) items;
+    mapping(uint256 => Item) items;
 
     //----------------------------------
     // Events
     //----------------------------------
 
-    event ForSale(uint skuCount);
-    event Sold(uint skuCount);
-    event Shipped(uint skuCount);
+    event ForSale(uint256 skuCount);
+    event Sold(uint256 skuCount);
+    event Shipped(uint256 skuCount);
 
     //----------------------------------
     // Modifiers
@@ -40,25 +43,25 @@ contract LemonadeStand {
         _;
     }
 
-    modifier paidEnough(uint _price) {
+    modifier paidEnough(uint256 _price) {
         require(msg.value >= _price);
         _;
     }
 
-    modifier checkValue(uint _sku) {
+    modifier checkValue(uint256 _sku) {
         _;
-        uint _price = items[_sku].price;
-        uint amountToRefund = msg.value - _price;
-        items{_sku}.buyer.transfer(amountToRefund);
+        uint256 _price = items[_sku].price;
+        uint256 amountToRefund = msg.value - _price;
+        items[_sku].buyer.transfer(amountToRefund);
     }
 
-    modifier forSale(uint _sku) {
+    modifier forSale(uint256 _sku) {
         require(items[_sku].state == State.ForSale);
         _;
     }
 
-    modifier sold(uint _sku) {
-        require(items[_sku].state == State.Sold)
+    modifier sold(uint256 _sku) {
+        require(items[_sku].state == State.Sold);
         _;
     }
 
@@ -71,7 +74,7 @@ contract LemonadeStand {
         skuCount = 0;
     }
 
-    function addItem(string _name, uint _price) onlyOwner public {
+    function addItem(string _name, uint256 _price) public onlyOwner {
         skuCount = skuCount + 1;
         emit ForSale(skuCount);
         items[skuCount] = Item({
@@ -81,18 +84,18 @@ contract LemonadeStand {
             state: State.ForSale,
             seller: msg.sender,
             buyer: 0
-        })
+        });
     }
 
-    function buyItem(uint _sale)
+    function buyItem(uint256 sku)
+        public
+        payable
         forSale(sku)
         paidEnough(items[sku].price)
         checkValue(sku)
-        public
-        payable
     {
         address buyer = msg.sender;
-        uint price = items[sku].price
+        uint256 price = items[sku].price;
 
         items[sku].buyer = buyer;
         items[sku].state = State.Sold;
@@ -101,33 +104,33 @@ contract LemonadeStand {
         emit Sold(sku);
     }
 
-    function shipItem(uint sku)
-        sold(sku);
-        verifyCaller(items[sku].seller)
+    function shipItem(uint256 sku)
         public
+        sold(sku)
+        verifyCaller(items[sku].seller)
     {
-        items[_sku].state = State.Shipped;
+        items[sku].state = State.Shipped;
 
-        emit Shipped(sku)
+        emit Shipped(sku);
     }
 
-    function fetchItem(uint _sku)
+    function fetchItem(uint256 _sku)
         public
-        view 
+        view
         returns (
-            string name, 
-            uint sku,
-            uint price
+            string name,
+            uint256 sku,
+            uint256 price,
             string stateIs,
             address seller,
-            address buyer,
+            address buyer
         )
     {
-        uint state;
+        uint256 state;
         name = items[_sku].name;
         sku = items[_sku].sku;
         price = items[_sku].price;
-        state = uint(items[_sku].state);
+        state = uint256(items[_sku].state);
 
         if (state == 0) {
             stateIs = "For Sale";
@@ -140,5 +143,4 @@ contract LemonadeStand {
         seller = items[_sku].seller;
         buyer = items[_sku].buyer;
     }
-
 }
