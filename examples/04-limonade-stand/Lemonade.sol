@@ -74,7 +74,7 @@ contract LemonadeStand {
         skuCount = 0;
     }
 
-    function addItem(string _name, uint256 _price) public onlyOwner {
+    function addItem(string calldata _name, uint256 _price) public onlyOwner {
         skuCount = skuCount + 1;
         emit ForSale(skuCount);
         items[skuCount] = Item({
@@ -118,10 +118,10 @@ contract LemonadeStand {
         public
         view
         returns (
-            string name,
+            string memory name,
             uint256 sku,
             uint256 price,
-            string stateIs,
+            string memory stateIs,
             address seller,
             address buyer
         )
