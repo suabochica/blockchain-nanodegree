@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.4;
 
 contract LemonadeStand {
 
@@ -7,7 +7,7 @@ contract LemonadeStand {
     //----------------------------------
     address owner;
     uint skuCount;
-    enum State { ForSale, Sold }
+    enum State { ForSale, Sold, Shipped }
     struct Item {
         string name;
         uint sku;
@@ -21,21 +21,46 @@ contract LemonadeStand {
     //----------------------------------
     // Events
     //----------------------------------
+
     event ForSale(uint skuCount);
     event Sold(uint skuCount);
+    event Shipped(uint skuCount);
 
     //----------------------------------
     // Modifiers
     //----------------------------------
-    modifier onlyOwner() {}
 
-    modifier verifyCaller(address _address) {}
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
 
-    modifier paidEnough(uint _price) {}
+    modifier verifyCaller(address _address) {
+        require(msg.sender == _address);
+        _;
+    }
 
-    modifier forSale(uint _sku) {}
+    modifier paidEnough(uint _price) {
+        require(msg.value >= _price);
+        _;
+    }
 
-    modifier sold(uint _sku) {}
+    modifier checkValue(uint _sku) {
+        _;
+        uint _price = items[_sku].price;
+        uint amountToRefund = msg.value - _price;
+        items{_sku}.buyer.transfer(amountToRefund);
+    }
+
+    modifier forSale(uint _sku) {
+        require(items[_sku].state == State.ForSale);
+        _;
+    }
+
+    modifier sold(uint _sku) {
+        require(items[_sku].state == State.Sold)
+        _;
+    }
 
     //----------------------------------
     // Functions
@@ -46,9 +71,45 @@ contract LemonadeStand {
         skuCount = 0;
     }
 
-    function addItem(string _name, uint _price) onlyOwner public {}
+    function addItem(string _name, uint _price) onlyOwner public {
+        skuCount = skuCount + 1;
+        emit ForSale(skuCount);
+        items[skuCount] = Item({
+            name: _name,
+            sku: skuCount,
+            price: _price,
+            state: State.ForSale,
+            seller: msg.sender,
+            buyer: 0
+        })
+    }
 
-    function buyItem(uint _sale) forSale(sky) paidEnoug(itemsp[sku].price) public payable {}
+    function buyItem(uint _sale)
+        forSale(sku)
+        paidEnough(items[sku].price)
+        checkValue(sku)
+        public
+        payable
+    {
+        address buyer = msg.sender;
+        uint price = items[sku].price
+
+        items[sku].buyer = buyer;
+        items[sku].state = State.Sold;
+        items[sku].seller.transfer(price);
+
+        emit Sold(sku);
+    }
+
+    function shipItem(uint sku)
+        sold(sku);
+        verifyCaller(items[sku].seller)
+        public
+    {
+        items[_sku].state = State.Shipped;
+
+        emit Shipped(sku)
+    }
 
     function fetchItem(uint _sku)
         public
@@ -60,6 +121,24 @@ contract LemonadeStand {
             string stateIs,
             address seller,
             address buyer,
-        ) {}
+        )
+    {
+        uint state;
+        name = items[_sku].name;
+        sku = items[_sku].sku;
+        price = items[_sku].price;
+        state = uint(items[_sku].state);
+
+        if (state == 0) {
+            stateIs = "For Sale";
+        }
+
+        if (state == 1) {
+            stateIs = "Sold";
+        }
+
+        seller = items[_sku].seller;
+        buyer = items[_sku].buyer;
+    }
 
 }
