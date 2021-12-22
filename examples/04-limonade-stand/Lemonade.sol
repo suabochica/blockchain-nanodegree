@@ -52,7 +52,7 @@ contract LemonadeStand {
         _;
         uint256 _price = items[_sku].price;
         uint256 amountToRefund = msg.value - _price;
-        items[_sku].buyer.transfer(amountToRefund);
+        payable(items[_sku].buyer).transfer(amountToRefund);
     }
 
     modifier forSale(uint256 _sku) {
@@ -83,7 +83,7 @@ contract LemonadeStand {
             price: _price,
             state: State.ForSale,
             seller: msg.sender,
-            buyer: 0
+            buyer: address(0)
         });
     }
 
@@ -99,7 +99,7 @@ contract LemonadeStand {
 
         items[sku].buyer = buyer;
         items[sku].state = State.Sold;
-        items[sku].seller.transfer(price);
+        payable(items[sku].seller).transfer(price);
 
         emit Sold(sku);
     }
