@@ -3,9 +3,17 @@ pragma solidity >=0.5.4;
 //----------------------------------
 // Imports
 //----------------------------------
-// TODO: Define the access roles and import them
 
-contract Base {
+import "./Ownable.sol";
+import "./access/roles/Consumer.sol";
+import "./access/roles/Distributor.sol";
+import "./access/roles/Farmer.sol";
+import "./access/roles/Producer.sol";
+import "./access/roles/Inspector.sol";
+import "./entities/Chontaduro.sol";
+import "./entities/Juice.sol";
+
+contract Base is Chontaduro, Juice {
     //----------------------------------
     // Variables
     //----------------------------------

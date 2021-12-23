@@ -1,6 +1,11 @@
 pragma solidity >=0.5.4;
 
-contract Juice {
+import "../access/roles/Consumer.sol";
+import "../access/roles/Distributor.sol";
+import "../access/roles/Inspector.sol";
+import "../access/roles/Producer.sol";
+
+contract Juice is Consumer, Distributor, Inspector, Producer {
     //----------------------------------
     // Variables
     //----------------------------------
@@ -127,6 +132,7 @@ contract Juice {
 
     function juiceCeratetItem(uint256 _chontaduroUpc, uint256 _productId)
         public
+        onlyProducer
     {
         skuCount = skuCount + 1;
 
@@ -153,7 +159,7 @@ contract Juice {
         uint256 _juiceUpc,
         string calldata _productNotes,
         uint256 _productPrice
-    ) public isBlended(_juiceUpc) {
+    ) public onlyProducer isBlended(_juiceUpc) {
         juiceItems[_juiceUpc].producerId = msg.sender;
         juiceItems[_juiceUpc].productNotes = _productNotes;
         juiceItems[_juiceUpc].price = _productPrice;
@@ -164,6 +170,7 @@ contract Juice {
 
     function juiceCertifyItem(uint256 _juiceUpc, string calldata _certifyNotes)
         public
+        onlyInspector
         isProduced(_juiceUpc)
     {
         juiceItems[_juiceUpc].certifyNotes = _certifyNotes;
@@ -172,13 +179,21 @@ contract Juice {
         emit JuiceCertified(_juiceUpc);
     }
 
-    function juicePackItem(uint256 _juiceUpc) public isCertified(_juiceUpc) {
+    function juicePackItem(uint256 _juiceUpc)
+        public
+        onlyProducer
+        isCertified(_juiceUpc)
+    {
         juiceItems[_juiceUpc].state = JuiceState.Packed;
 
         emit JuicePacked(_juiceUpc);
     }
 
-    function juiceSellItem(uint256 _juiceUpc) public isPacked(_juiceUpc) {
+    function juiceSellItem(uint256 _juiceUpc)
+        public
+        onlyDistributor
+        isPacked(_juiceUpc)
+    {
         juiceItems[_juiceUpc].distributorId = msg.sender;
         juiceItems[_juiceUpc].state = JuiceState.ReadyForSale;
 
@@ -187,9 +202,11 @@ contract Juice {
 
     function juiceBuyItem(uint256 _juiceUpc)
         public
+        payable
+        onlyConsumer
         isReadyForSale(_juiceUpc)
-    // paidEnough(juiceItems[_juiceUpc].price)
-    // checkValue(_juiceUpc)
+        paidEnough(juiceItems[_juiceUpc].price)
+        checkValue(_juiceUpc)
     {
         juiceItems[_juiceUpc].ownerId = msg.sender;
         juiceItems[_juiceUpc].consumerId = msg.sender;

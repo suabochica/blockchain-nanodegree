@@ -1,6 +1,9 @@
 pragma solidity >=0.5.4;
 
-contract Chontaduro {
+import "../access/roles/Farmer.sol";
+import "../access/roles/Inspector.sol";
+
+contract Chontaduro is Farmer, Inspector {
     //----------------------------------
     // Variables
     //----------------------------------
@@ -41,16 +44,6 @@ contract Chontaduro {
     // Modifiers
     //----------------------------------
 
-    modifier verifyCaller(address _address) {
-        require(msg.sender == _address, "Verify Caller: Unexpected Caller");
-        _;
-    }
-
-    modifier paidEnough(uint256 _price) {
-        require(msg.value == _price, "Paid Enough: Not Enough Value");
-        _;
-    }
-
     // TODO: Check value is in the chontaduro scope?
     // modifier checkValue(uint256 _juiceUpc) {
     //     _;
@@ -58,9 +51,6 @@ contract Chontaduro {
     //     uint256 amountToreturn = msg.value - _prive;
     //     items[_juiceUpc].consumerId.transfer(amountToRefund);
     // }
-
-    // Chontaduro Modifiers
-    //----------------------------------
 
     modifier isPlanted(uint256 _chontaduroUpc) {
         require(
@@ -118,7 +108,7 @@ contract Chontaduro {
         string calldata _originFarmInformation,
         string calldata _originFarmLatitude,
         string calldata _originFarmLongitude
-    ) public {
+    ) public onlyFarmer {
         skuCount = skuCount + 1;
 
         chontaduroItems[_chontaduroUpc] = ChontaduroItem({
@@ -141,7 +131,7 @@ contract Chontaduro {
     function chontaduroHarvestItem(
         uint256 _chontaduroUpc,
         string calldata _harvestNotes
-    ) public isPlanted(_chontaduroUpc) {
+    ) public onlyFarmer isPlanted(_chontaduroUpc) {
         chontaduroItems[_chontaduroUpc].ownerId = msg.sender;
         chontaduroItems[_chontaduroUpc].harvestNotes = _harvestNotes;
         chontaduroItems[_chontaduroUpc].state = ChontaduroState.Harvested;
@@ -152,7 +142,7 @@ contract Chontaduro {
     function chontaduroAuditItem(
         uint256 _chontaduroUpc,
         string calldata _auditNotes
-    ) public isHarvested(_chontaduroUpc) {
+    ) public onlyInspector isHarvested(_chontaduroUpc) {
         chontaduroItems[_chontaduroUpc].auditNotes = _auditNotes;
         chontaduroItems[_chontaduroUpc].state = ChontaduroState.Audited;
 
@@ -161,6 +151,7 @@ contract Chontaduro {
 
     function chontaduroProcessItem(uint256 _chontaduroUpc)
         public
+        onlyFarmer
         isAudited(_chontaduroUpc)
     {
         chontaduroItems[_chontaduroUpc].state = ChontaduroState.Processed;
