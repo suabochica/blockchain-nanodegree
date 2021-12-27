@@ -1,37 +1,66 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>MetaCoin | Truffle Webpack Demo w/ Frontend</title>
-  </head>
-  <style>
-    input {
-      display: block;
-      margin-bottom: 12px;
-    }
-  </style>
-  <body>
-    <h1>MetaCoin — Example Truffle Dapp</h1>
-    <p>You have <strong class="balance">loading...</strong> META</p>
 
-    <h1>Send MetaCoin</h1>
+<head>
+  <title>Chontaduro</title>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link href="main.css" rel="stylesheet" type="text/css">
+</head>
 
-    <label for="amount">Amount:</label>
-    <input type="text" id="amount" placeholder="e.g. 95" />
+<body>
+  <h1>Chontaduro — Supply Chain DApp</h1>
+  <div class="container">
+    <p>Know the Chontaduro supply chain using the Ethereum Blockchain</p>
+  </div>
 
-    <label for="receiver">To address:</label>
-    <input
-      type="text"
-      id="receiver"
-      placeholder="e.g. 0x93e66d9baea28c17d9fc393b53e3fbdd76899dae"
-    />
+  <div class="product-overview-section">
+    <h2>Product Overview</h2>
+    <label for="ownerId">Farmer Id</label>
+    <input type="text" id="ownerId" name="ownerId" value=""></input>
+    <br>
+  </div>
 
-    <button onclick="App.sendCoin()">Send MetaCoin</button>
+  <div class="farm-details-section">
+    <h2>Farm Details</h2>
+    <label for="originFarmerId">Farmer Id</label>
+    <input type="text" id="originFarmerId" name="originFarmerId" value=""></input>
+    <br>
+    <label for="originFarmName">Farmer Name</label>
+    <input type="text" id="originFarmName" name="originFarmName" value="Chontaduro Maduro"></input>
+    <br>
+    <label for="originFarmInformation">Farmer Name</label>
+    <input type="text" id="originFarmInformation" name="originFarmInformation" value="Negrito Arturo"></input>
+    <br>
+    <label for="originFarmLatitude">Farmer Latitude</label>
+    <input type="text" id="originFarmLatitude" name="originFarmLatitude" value="10.963889"></input>
+    <br>
+    <label for="originFarmLongitude">Farmer Longitude</label>
+    <input type="text" id="originFarmLongitude" name="originFarmLongitude" value="-74.796387"></input>
+    <br>
+    <button class="btn-plant" type="button" id="button" data-id="1">Plant</button>
+    <button class="btn-harvest" type="button" id="button" data-id="2">Harvest</button>
+    <button class="btn-audit" type="button" id="button" data-id="3">Audit</button>
+    <button class="btn-process" type="button" id="button" data-id="4">Process</button>
+    <button class="btn-produce" type="button" id="button" data-id="5">Produce</button>
+  </div>
 
-    <p id="status"></p>
-    <p>
-      <strong>Hint:</strong> open the browser developer console to view any
-      errors and warnings.
-    </p>
-    <script src="index.js"></script>
-  </body>
+
+  <div class="product-details-section">
+    <h2>Product Details</h2>
+    <button class="btn-certify" type="button" id="button" data-id="6">Certify</button>
+    <button class="btn-pack" type="button" id="button" data-id="7">Pack</button>
+    <button class="btn-for-sale" type="button" id="button" data-id="8">ForSale</button>
+    <button class="btn-for-sale" type="button" id="button" data-id="9">Buy</button>
+  </div>
+
+  <div class="transaction-history-section">
+    <h2>Transaction History</h2>
+    <ul id="recorded-events">
+      <!-- Events from app.js -->
+    </ul>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+
 </html>
