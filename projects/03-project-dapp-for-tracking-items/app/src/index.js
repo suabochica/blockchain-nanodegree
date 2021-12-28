@@ -4,7 +4,27 @@ import supplyChainArtifact from "../../build/contracts/SupplyChain.json";
 const App = {
   web3: null,
   account: null,
-  meta: null,
+  supplyChain: null,
+  // emptyAddress: "0x0000000000000000000000000000000000000000",
+  // metaMaskAccountId: "0x0000000000000000000000000000000000000000",
+  // sku: 0,
+  // upc: 0,
+  // productId: 0,
+  // ownerId: "0x0000000000000000000000000000000000000000",
+  // originFarmerId: "0x0000000000000000000000000000000000000000",
+  // originFarmName: "",
+  // originFarmInformation: null,
+  // originFarmLatitude: null,
+  // originFarmLongitude: null,
+  // harvestNotes: "",
+  // auditNotes: "",
+  // producerId: "0x0000000000000000000000000000000000000000",
+  // price: 0,
+  // productNotes: "",
+  // certifyNotes: "",
+  // distributorId: "0x0000000000000000000000000000000000000000",
+  // consumerId: "0x0000000000000000000000000000000000000000",
+
 
   start: async function () {
     const { web3 } = this;
@@ -13,7 +33,7 @@ const App = {
       // get contract instance
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = supplyChainArtifact.networks[networkId];
-      this.meta = new web3.eth.Contract(
+      this.supplyChain = new web3.eth.Contract(
         supplyChainArtifact.abi,
         deployedNetwork.address,
       );
@@ -22,47 +42,49 @@ const App = {
       const accounts = await web3.eth.getAccounts();
       this.account = accounts[0];
 
-      this.readForm();
+      // this.readForm();
     } catch (error) {
       console.error("Could not connect to contract or chain.");
     }
   },
 
-  readForm: function () {
-    const sku = document.getElementById("sku").value;
-    const upc = document.getElementById("upc").value;
-    const ownerId = document.getElementById("ownerId").value;
-    const originFarmerId = document.getElementById("originFarmerId").value;
-    const originFarmName = document.getElementById("originFarmName").value;
-    const originFarmInformation = document.getElementById("originFarmInformation").value;
-    const originFarmLatitude = document.getElementById("originFarmLatitude").value;
-    const originFarmLongitude = document.getElementById("originFarmLongitude").value;
-    const harvestNotes = document.getElementById("harvestNotes").value;
-    const auditNotes = document.getElementById("auditNotes").value;
-    const producerId = document.getElementById("producerId").value;
-    const price = document.getElementById("price").value;
-    const productNotes = document.getElementById("productNotes").value;
-    const certifyNotes = document.getElementById("certifyNotes").value;
-    const distributorId = document.getElementById("distributorId").value;
-    const consumerId = document.getElementById("consumerId").value;
+  // readForm: function () {
+  //   App.sku = document.getElementById("sku").value;
+  //   App.upc = document.getElementById("upc").value;
+  //   App.productId = document.getElementById("productId").value;
+  //   App.ownerId = document.getElementById("ownerId").value;
+  //   App.originFarmerId = document.getElementById("originFarmerId").value;
+  //   App.originFarmName = document.getElementById("originFarmName").value;
+  //   App.originFarmInformation = document.getElementById("originFarmInformation").value;
+  //   App.originFarmLatitude = document.getElementById("originFarmLatitude").value;
+  //   App.originFarmLongitude = document.getElementById("originFarmLongitude").value;
+  //   App.harvestNotes = document.getElementById("harvestNotes").value;
+  //   App.auditNotes = document.getElementById("auditNotes").value;
+  //   App.producerId = document.getElementById("producerId").value;
+  //   App.price = document.getElementById("price").value;
+  //   App.productNotes = document.getElementById("productNotes").value;
+  //   App.certifyNotes = document.getElementById("certifyNotes").value;
+  //   App.distributorId = document.getElementById("distributorId").value;
+  //   App.consumerId = document.getElementById("consumerId").value;
 
-    console.log("sku:", sku);
-    console.log("upc:", upc);
-    console.log("ownerId:", ownerId);
-    console.log("originFarmerId:", originFarmerId);
-    console.log("originFarmName:", originFarmName);
-    console.log("originFarmInformation:", originFarmInformation);
-    console.log("originFarmLatitude:", originFarmLatitude);
-    console.log("originFarmLongitude:", originFarmLongitude);
-    console.log("harvestNotes:", harvestNotes);
-    console.log("auditNotes:", auditNotes);
-    console.log("producerId:", producerId);
-    console.log("price:", price);
-    console.log("productNotes:", productNotes);
-    console.log("certifyNotes:", certifyNotes);
-    console.log("distributorId:", distributorId);
-    console.log("consumerId:", consumerId);
-  },
+  //   console.log("sku:", App.sku);
+  //   console.log("upc:", App.upc);
+  //   console.log("productId:", App.productId);
+  //   console.log("ownerId:", App.ownerId);
+  //   console.log("originFarmerId:", App.originFarmerId);
+  //   console.log("originFarmName:", App.originFarmName);
+  //   console.log("originFarmInformation:", App.originFarmInformation);
+  //   console.log("originFarmLatitude:", App.originFarmLatitude);
+  //   console.log("originFarmLongitude:", App.originFarmLongitude);
+  //   console.log("harvestNotes:", App.harvestNotes);
+  //   console.log("auditNotes:", App.auditNotes);
+  //   console.log("producerId:", App.producerId);
+  //   console.log("price:", App.price);
+  //   console.log("productNotes:", App.productNotes);
+  //   console.log("certifyNotes:", App.certifyNotes);
+  //   console.log("distributorId:", App.distributorId);
+  //   console.log("consumerId:", App.consumerId);
+  // },
 
   sendCoin: async function () {
     const amount = parseInt(document.getElementById("amount").value);
@@ -89,7 +111,7 @@ const App = {
   handleButtonClick: async function (event) {
     event.preventDefault();
 
-    let statusId = event.target;
+    let statusId = parseInt(event.target.getAttribute('data-id'));
     console.log("statusId", statusId);
 
     switch (statusId) {
@@ -129,30 +151,169 @@ const App = {
     }
   },
 
-  plantItem: function (event) { },
+  plantItem: async function (event) {
+    event.preventDefault();
 
-  harvestItem: function (event) { },
+    const upc = document.getElementById("upc").value;
+    const productId = document.getElementById("productId").value;
+    const originFarmerId = document.getElementById("originFarmerId").value;
+    const originFarmName = document.getElementById("originFarmName").value;
+    const originFarmInformation = document.getElementById("originFarmInformation").value;
+    const originFarmLatitude = document.getElementById("originFarmLatitude").value;
+    const originFarmLongitude = document.getElementById("originFarmLongitude").value;
 
-  auditItem: function (event) { },
+    let statusId = event.target.getAttribute('data-id');
+    statusId = parseInt(statusId);
 
-  processItem: function (event) { },
+    const { plantItem } = ths.supplyChain.methods;
 
-  produceItem: function (event) { },
+    await plantItem(
+      upc,
+      productId,
+      originFarmerId,
+      originFarmName,
+      originFarmInformation,
+      originFarmLatitude,
+      originFarmLongitude
+    ).send({ from: this.account });
+  },
 
-  certifyItem: function (event) { },
+  harvestItem: function (event) {
+    event.preventDefault();
 
-  packItem: function (event) { },
+    const upc = document.getElementById("upc").value;
+    const ownerId = document.getElementById("ownerId").value;
+    const harvestNotes = document.getElementById("harvestNotes").value;
 
-  sellItem: function (event) { },
+    let statusId = parseInt(event.target.getAttribute('data-id'));
+    statusId = parseInt(statusId);
 
-  sellItem: function (event) { },
+    const { harvestItem } = ths.supplyChain.methods;
 
-  buyItem: function (event) { },
+    await harvestItem(
+      upc,
+      harvestNotes,
+    ).send({ from: this.account });
+  },
 
-  fetchItemFirstParams: function (event) { },
+  auditItem: function (event) {
+    event.preventDefault();
 
-  fetchItemSecondParams: function (event) { },
+    const upc = document.getElementById("upc").value;
+    const auditNotes = document.getElementById("auditNotes").value;
 
+    let statusId = parseInt(event.target.getAttribute('data-id'));
+    statusId = parseInt(statusId);
+
+    const { auditItem } = ths.supplyChain.methods;
+
+    await auditItem(upc, auditNotes).send({ from: this.account });
+  },
+
+  processItem: function (event) {
+    event.preventDefault();
+
+    const upc = document.getElementById("upc").value;
+    let statusId = parseInt(event.target.getAttribute('data-id'));
+    statusId = parseInt(statusId);
+
+    const { processItem } = ths.supplyChain.methods;
+
+    await processItem(upc).send({ from: this.account });
+  },
+
+  produceItem: function (event) {
+    event.preventDefault();
+
+    const upc = document.getElementById("upc").value;
+    const producerId = document.getElementById("producerId").value;
+    const productNotes = document.getElementById("productNotes").value;
+    const price = document.getElementById("price").value;
+
+    let statusId = parseInt(event.target.getAttribute('data-id'));
+    statusId = parseInt(statusId);
+
+    const { produceItem } = ths.supplyChain.methods;
+
+    await produceItem(
+      upc,
+      productNotes,
+      price,
+    ).send({ from: this.account });
+  },
+
+  certifyItem: function (event) {
+    event.preventDefault();
+    const certifyNotes = document.getElementById("certifyNotes").value;
+
+    const upc = document.getElementById("upc").value;
+    let statusId = parseInt(event.target.getAttribute('data-id'));
+    statusId = parseInt(statusId);
+
+    const { certifyItem } = ths.supplyChain.methods;
+
+    await certifyItem(upc, certifyNotes).send({ from: this.account });
+  },
+
+  packItem: function (event) {
+    event.preventDefault();
+
+    const upc = document.getElementById("upc").value;
+    let statusId = parseInt(event.target.getAttribute('data-id'));
+    statusId = parseInt(statusId);
+
+    const { packItem } = ths.supplyChain.methods;
+
+    await packItem(upc).send({ from: this.account });
+  },
+
+  sellItem: function (event) {
+    event.preventDefault();
+
+    const upc = document.getElementById("upc").value;
+    let statusId = parseInt(event.target.getAttribute('data-id'));
+    statusId = parseInt(statusId);
+
+    const { sellItem } = ths.supplyChain.methods;
+
+    await sellItem(upc).send({ from: this.account });
+  },
+
+  buyItem: function (event) {
+    event.preventDefault();
+
+    const upc = document.getElementById("upc").value;
+    let statusId = parseInt(event.target.getAttribute('data-id'));
+    statusId = parseInt(statusId);
+
+    const { buyItem } = ths.supplyChain.methods;
+
+    await buyItem(upc).send({ from: this.account });
+  },
+
+  fetchItemFirstParams: function (event) {
+    event.preventDefault();
+
+    const upc = document.getElementById("upc").value;
+    let statusId = parseInt(event.target.getAttribute('data-id'));
+    statusId = parseInt(statusId);
+
+    const { fetchItemFirstParams } = ths.supplyChain.methods;
+
+    await fetchItemFirstParams(upc).send({ from: this.account });
+  },
+
+  fetchItemSecondParams: function (event) {
+    event.preventDefault();
+
+    const upc = document.getElementById("upc").value;
+    let statusId = parseInt(event.target.getAttribute('data-id'));
+    statusId = parseInt(statusId);
+
+    const { fetchItemSecondParams } = ths.supplyChain.methods;
+
+    await fetchItemSecondParams(upc).send({ from: this.account });
+  },
 };
 
 window.App = App;
