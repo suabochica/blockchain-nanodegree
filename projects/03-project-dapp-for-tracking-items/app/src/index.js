@@ -165,7 +165,7 @@ const App = {
     let statusId = event.target.getAttribute('data-id');
     statusId = parseInt(statusId);
 
-    const { plantItem } = ths.supplyChain.methods;
+    const { plantItem } = this.supplyChain.methods;
 
     await plantItem(
       upc,
@@ -178,7 +178,7 @@ const App = {
     ).send({ from: this.account });
   },
 
-  harvestItem: function (event) {
+  harvestItem: async function (event) {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
@@ -188,7 +188,7 @@ const App = {
     let statusId = parseInt(event.target.getAttribute('data-id'));
     statusId = parseInt(statusId);
 
-    const { harvestItem } = ths.supplyChain.methods;
+    const { harvestItem } = this.supplyChain.methods;
 
     await harvestItem(
       upc,
@@ -196,7 +196,7 @@ const App = {
     ).send({ from: this.account });
   },
 
-  auditItem: function (event) {
+  auditItem: async function (event) {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
@@ -205,24 +205,24 @@ const App = {
     let statusId = parseInt(event.target.getAttribute('data-id'));
     statusId = parseInt(statusId);
 
-    const { auditItem } = ths.supplyChain.methods;
+    const { auditItem } = this.supplyChain.methods;
 
     await auditItem(upc, auditNotes).send({ from: this.account });
   },
 
-  processItem: function (event) {
+  processItem: async function (event) {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
     let statusId = parseInt(event.target.getAttribute('data-id'));
     statusId = parseInt(statusId);
 
-    const { processItem } = ths.supplyChain.methods;
+    const { processItem } = this.supplyChain.methods;
 
     await processItem(upc).send({ from: this.account });
   },
 
-  produceItem: function (event) {
+  produceItem: async function (event) {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
@@ -233,7 +233,7 @@ const App = {
     let statusId = parseInt(event.target.getAttribute('data-id'));
     statusId = parseInt(statusId);
 
-    const { produceItem } = ths.supplyChain.methods;
+    const { produceItem } = this.supplyChain.methods;
 
     await produceItem(
       upc,
@@ -242,7 +242,7 @@ const App = {
     ).send({ from: this.account });
   },
 
-  certifyItem: function (event) {
+  certifyItem: async function (event) {
     event.preventDefault();
     const certifyNotes = document.getElementById("certifyNotes").value;
 
@@ -250,67 +250,67 @@ const App = {
     let statusId = parseInt(event.target.getAttribute('data-id'));
     statusId = parseInt(statusId);
 
-    const { certifyItem } = ths.supplyChain.methods;
+    const { certifyItem } = this.supplyChain.methods;
 
     await certifyItem(upc, certifyNotes).send({ from: this.account });
   },
 
-  packItem: function (event) {
+  packItem: async function (event) {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
     let statusId = parseInt(event.target.getAttribute('data-id'));
     statusId = parseInt(statusId);
 
-    const { packItem } = ths.supplyChain.methods;
+    const { packItem } = this.supplyChain.methods;
 
     await packItem(upc).send({ from: this.account });
   },
 
-  sellItem: function (event) {
+  sellItem: async function (event) {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
     let statusId = parseInt(event.target.getAttribute('data-id'));
     statusId = parseInt(statusId);
 
-    const { sellItem } = ths.supplyChain.methods;
+    const { sellItem } = this.supplyChain.methods;
 
     await sellItem(upc).send({ from: this.account });
   },
 
-  buyItem: function (event) {
+  buyItem: async function (event) {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
     let statusId = parseInt(event.target.getAttribute('data-id'));
     statusId = parseInt(statusId);
 
-    const { buyItem } = ths.supplyChain.methods;
+    const { buyItem } = this.supplyChain.methods;
 
     await buyItem(upc).send({ from: this.account });
   },
 
-  fetchItemFirstParams: function (event) {
+  fetchItemFirstParams: async function (event) {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
     let statusId = parseInt(event.target.getAttribute('data-id'));
     statusId = parseInt(statusId);
 
-    const { fetchItemFirstParams } = ths.supplyChain.methods;
+    const { fetchItemFirstParams } = this.supplyChain.methods;
 
     await fetchItemFirstParams(upc).send({ from: this.account });
   },
 
-  fetchItemSecondParams: function (event) {
+  fetchItemSecondParams: async function (event) {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
     let statusId = parseInt(event.target.getAttribute('data-id'));
     statusId = parseInt(statusId);
 
-    const { fetchItemSecondParams } = ths.supplyChain.methods;
+    const { fetchItemSecondParams } = this.supplyChain.methods;
 
     await fetchItemSecondParams(upc).send({ from: this.account });
   },

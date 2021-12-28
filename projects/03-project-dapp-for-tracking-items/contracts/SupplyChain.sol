@@ -1,4 +1,4 @@
-pragma solidity >=0.5.4;
+pragma solidity ^0.4.24;
 
 //----------------------------------
 // Imports
@@ -11,7 +11,14 @@ import "./access/roles/Farmer.sol";
 import "./access/roles/Producer.sol";
 import "./access/roles/Inspector.sol";
 
-contract Base is Ownable, Consumer, Distributor, Farmer, Producer, Inspector {
+contract SupplyChain is
+    Ownable,
+    Consumer,
+    Distributor,
+    Farmer,
+    Producer,
+    Inspector
+{
     //----------------------------------
     // Variables
     //----------------------------------
@@ -83,10 +90,10 @@ contract Base is Ownable, Consumer, Distributor, Farmer, Producer, Inspector {
     }
 
     modifier checkValue(uint256 _upc) {
-        _;
         uint256 _price = items[_upc].price;
         uint256 amountToRefund = msg.value - _price;
-        payable(items[_upc].consumerId).transfer(amountToRefund);
+        items[_upc].consumerId.transfer(amountToRefund);
+        _;
     }
 
     modifier isPlanted(uint256 _upc) {
@@ -153,10 +160,10 @@ contract Base is Ownable, Consumer, Distributor, Farmer, Producer, Inspector {
         uint256 _upc,
         uint256 _productId,
         address _originFarmerId,
-        string calldata _originFarmName,
-        string calldata _originFarmInformation,
-        string calldata _originFarmLatitude,
-        string calldata _originFarmLongitude
+        string _originFarmName,
+        string _originFarmInformation,
+        string _originFarmLatitude,
+        string _originFarmLongitude
     ) public onlyFarmer {
         sku = sku + 1;
 
@@ -173,7 +180,7 @@ contract Base is Ownable, Consumer, Distributor, Farmer, Producer, Inspector {
         emit Planted(_upc);
     }
 
-    function harvestItem(uint256 _upc, string calldata _harvestNotes)
+    function harvestItem(uint256 _upc, string _harvestNotes)
         public
         onlyFarmer
         isPlanted(_upc)
@@ -185,7 +192,7 @@ contract Base is Ownable, Consumer, Distributor, Farmer, Producer, Inspector {
         emit Harvested(_upc);
     }
 
-    function auditItem(uint256 _upc, string calldata _auditNotes)
+    function auditItem(uint256 _upc, string _auditNotes)
         public
         onlyInspector
         isHarvested(_upc)
@@ -204,7 +211,7 @@ contract Base is Ownable, Consumer, Distributor, Farmer, Producer, Inspector {
 
     function produceItem(
         uint256 _upc,
-        string calldata _productNotes,
+        string _productNotes,
         uint256 _productPrice
     ) public onlyProducer isProcessed(_upc) {
         items[_upc].producerId = msg.sender;
@@ -215,7 +222,7 @@ contract Base is Ownable, Consumer, Distributor, Farmer, Producer, Inspector {
         emit Produced(_upc);
     }
 
-    function certifyItem(uint256 _upc, string calldata _certifyNotes)
+    function certifyItem(uint256 _upc, string _certifyNotes)
         public
         onlyInspector
         isProduced(_upc)
@@ -251,7 +258,7 @@ contract Base is Ownable, Consumer, Distributor, Farmer, Producer, Inspector {
         items[_upc].consumerId = msg.sender;
 
         uint256 price = items[_upc].price;
-        payable(items[_upc].producerId).transfer(price);
+        items[_upc].producerId.transfer(price);
 
         items[_upc].state = State.Sold;
 
@@ -262,40 +269,34 @@ contract Base is Ownable, Consumer, Distributor, Farmer, Producer, Inspector {
         public
         view
         returns (
-            uint256 sku,
-            uint256 upc,
+            uint256 itemSku,
+            uint256 itemUpc,
             address ownerId,
             address originFarmerId,
-            string memory originFarmName,
-            string memory originFarmInformation,
-            string memory originFarmLatitude,
-            string memory originFarmLongitude,
-            string memory auditNotes,
-            string memory harvestNotes
+            string originFarmName,
+            string originFarmInformation,
+            string originFarmLatitude,
+            string originFarmLongitude
         )
     {
-        sku = items[_upc].sku;
-        upc = items[_upc].upc;
+        itemSku = items[_upc].sku;
+        itemUpc = items[_upc].upc;
         ownerId = items[_upc].ownerId;
         originFarmerId = items[_upc].originFarmerId;
         originFarmName = items[_upc].originFarmName;
         originFarmInformation = items[_upc].originFarmInformation;
         originFarmLatitude = items[_upc].originFarmLatitude;
         originFarmLongitude = items[_upc].originFarmLongitude;
-        auditNotes = items[_upc].auditNotes;
-        harvestNotes = items[_upc].harvestNotes;
 
         return (
-            sku,
-            upc,
+            itemSku,
+            itemUpc,
             ownerId,
             originFarmerId,
             originFarmName,
             originFarmInformation,
             originFarmLatitude,
-            originFarmLongitude,
-            auditNotes,
-            harvestNotes
+            originFarmLongitude
         );
     }
 
@@ -303,43 +304,37 @@ contract Base is Ownable, Consumer, Distributor, Farmer, Producer, Inspector {
         public
         view
         returns (
-            uint256 sku,
-            uint256 upc,
+            uint256 itemSku,
+            uint256 itemUpc,
             uint256 productId,
             uint256 price,
             uint256 state,
-            address ownerId,
             address producerId,
             address distributorId,
             address consumerId,
-            string memory productNotes,
-            string memory certifyNotes
+            string productNotes
         )
     {
-        sku = items[_upc].sku;
-        upc = items[_upc].upc;
+        itemSku = items[_upc].sku;
+        itemUpc = items[_upc].upc;
         productId = items[_upc].productId;
         price = items[_upc].price;
         state = uint256(items[_upc].state);
-        ownerId = items[_upc].ownerId;
         producerId = items[_upc].producerId;
         distributorId = items[_upc].distributorId;
         consumerId = items[_upc].consumerId;
         productNotes = items[_upc].productNotes;
-        certifyNotes = items[_upc].certifyNotes;
 
         return (
-            sku,
-            upc,
+            itemSku,
+            itemUpc,
             productId,
             price,
             state,
-            ownerId,
             producerId,
             distributorId,
             consumerId,
-            productNotes,
-            certifyNotes
+            productNotes
         );
     }
 }
