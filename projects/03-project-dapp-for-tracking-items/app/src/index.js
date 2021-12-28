@@ -1,20 +1,20 @@
 import Web3 from "web3";
-import metaCoinArtifact from "../../build/contracts/MetaCoin.json";
+import supplyChainArtifact from "../../build/contracts/SupplyChain.json";
 
 const App = {
   web3: null,
   account: null,
   meta: null,
 
-  start: async function() {
+  start: async function () {
     const { web3 } = this;
 
     try {
       // get contract instance
       const networkId = await web3.eth.net.getId();
-      const deployedNetwork = metaCoinArtifact.networks[networkId];
+      const deployedNetwork = supplyChainArtifact.networks[networkId];
       this.meta = new web3.eth.Contract(
-        metaCoinArtifact.abi,
+        supplyChainArtifact.abi,
         deployedNetwork.address,
       );
 
@@ -22,21 +22,49 @@ const App = {
       const accounts = await web3.eth.getAccounts();
       this.account = accounts[0];
 
-      this.refreshBalance();
+      this.readForm();
     } catch (error) {
       console.error("Could not connect to contract or chain.");
     }
   },
 
-  refreshBalance: async function() {
-    const { getBalance } = this.meta.methods;
-    const balance = await getBalance(this.account).call();
+  readForm: function () {
+    const sku = document.getElementById("sku").value;
+    const upc = document.getElementById("upc").value;
+    const ownerId = document.getElementById("ownerId").value;
+    const originFarmerId = document.getElementById("originFarmerId").value;
+    const originFarmName = document.getElementById("originFarmName").value;
+    const originFarmInformation = document.getElementById("originFarmInformation").value;
+    const originFarmLatitude = document.getElementById("originFarmLatitude").value;
+    const originFarmLongitude = document.getElementById("originFarmLongitude").value;
+    const harvestNotes = document.getElementById("harvestNotes").value;
+    const auditNotes = document.getElementById("auditNotes").value;
+    const producerId = document.getElementById("producerId").value;
+    const price = document.getElementById("price").value;
+    const productNotes = document.getElementById("productNotes").value;
+    const certifyNotes = document.getElementById("certifyNotes").value;
+    const distributorId = document.getElementById("distributorId").value;
+    const consumerId = document.getElementById("consumerId").value;
 
-    const balanceElement = document.getElementsByClassName("balance")[0];
-    balanceElement.innerHTML = balance;
+    console.log("sku:", sku);
+    console.log("upc:", upc);
+    console.log("ownerId:", ownerId);
+    console.log("originFarmerId:", originFarmerId);
+    console.log("originFarmName:", originFarmName);
+    console.log("originFarmInformation:", originFarmInformation);
+    console.log("originFarmLatitude:", originFarmLatitude);
+    console.log("originFarmLongitude:", originFarmLongitude);
+    console.log("harvestNotes:", harvestNotes);
+    console.log("auditNotes:", auditNotes);
+    console.log("producerId:", producerId);
+    console.log("price:", price);
+    console.log("productNotes:", productNotes);
+    console.log("certifyNotes:", certifyNotes);
+    console.log("distributorId:", distributorId);
+    console.log("consumerId:", consumerId);
   },
 
-  sendCoin: async function() {
+  sendCoin: async function () {
     const amount = parseInt(document.getElementById("amount").value);
     const receiver = document.getElementById("receiver").value;
 
@@ -49,15 +77,87 @@ const App = {
     this.refreshBalance();
   },
 
-  setStatus: function(message) {
+  setStatus: function (message) {
     const status = document.getElementById("status");
     status.innerHTML = message;
   },
+
+  bindClickEvent: function () {
+    document.addEventListener("click", this.handleButtonClick());
+  },
+
+  handleButtonClick: async function (event) {
+    event.preventDefault();
+
+    let statusId = event.target;
+    console.log("statusId", statusId);
+
+    switch (statusId) {
+      case 1:
+        return await this.plantItem(event);
+        break;
+      case 2:
+        return await this.harvestItem(event);
+        break;
+      case 3:
+        return await this.auditItem(event);
+        break;
+      case 4:
+        return await this.processItem(event);
+        break;
+      case 5:
+        return await this.produceItem(event);
+        break;
+      case 6:
+        return await this.certifyItem(event);
+        break;
+      case 7:
+        return await this.packItem(event);
+        break;
+      case 8:
+        return await this.sellItem(event);
+        break;
+      case 9:
+        return await this.buyItem(event);
+        break;
+      case 10:
+        return await this.fetchItemFirstParams(event);
+        break;
+      case 11:
+        return await this.fetchItemSecondParams(event);
+        break;
+    }
+  },
+
+  plantItem: function (event) { },
+
+  harvestItem: function (event) { },
+
+  auditItem: function (event) { },
+
+  processItem: function (event) { },
+
+  produceItem: function (event) { },
+
+  certifyItem: function (event) { },
+
+  packItem: function (event) { },
+
+  sellItem: function (event) { },
+
+  sellItem: function (event) { },
+
+  buyItem: function (event) { },
+
+  fetchItemFirstParams: function (event) { },
+
+  fetchItemSecondParams: function (event) { },
+
 };
 
 window.App = App;
 
-window.addEventListener("load", function() {
+window.addEventListener("load", function () {
   if (window.ethereum) {
     // use MetaMask's provider
     App.web3 = new Web3(window.ethereum);
