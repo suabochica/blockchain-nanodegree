@@ -1,5 +1,6 @@
-const truffleAssert = require("truffle-assertions");
+
 const SupplyChain = artifacts.require("SupplyChain");
+const truffleAssert = require("truffle-assertions");
 
 contract("SupplyChain", accounts => {
   //----------------------------------
@@ -22,12 +23,25 @@ contract("SupplyChain", accounts => {
   const originFarmLongitude = "-74.796387";
   const productId = sku + upc;
   const price = web3.toWei(1, "ether")
+
   let harvestNotes = "Harvest Notes";
   let auditNotes = "Audit Notes";
   let certifyNotes = "Certify Notes";
   let productNotes = "Product Notes";
 
   const emptyAddress = '0x00000000000000000000000000000000000000'
+
+  // Accounts:
+  // (0) 0x6056eaa347edabb0418193281313bb4546c14ec4
+  // (1) 0x836ebbe93aca2e476ec286b0dfd6ef527106e37e
+  // (2) 0x2d525c92908b481ede5aec62736a265740acdb4d
+  // (3) 0xba4806d27a2d69858328fe0b426c1d03038b7161
+  // (4) 0xa1eef75f99ff244be00cdce018fb95b36983513a
+  // (5) 0xff7bb7259db94a82fff86eb9ed3214ee39f8d449
+  // (6) 0xb47d7fb99e6571550950f53e71c18f211c39b46b
+  // (7) 0xd2feb8255743905a33784855c354ce24253df544
+  // (8) 0xc9bdd79bc46b357590c791e71ebafcb35ad01f89
+  // (9) 0xf23aa1a9c7369a9ba8ffde4604ca47a2fbc4d17e
 
   it("should add the roles to the contract", async () => {
     const supplyChain = await SupplyChain.deployed();
@@ -66,11 +80,11 @@ contract("SupplyChain", accounts => {
     truffleAssert.eventEmitted(event, "Planted");
 
     const resultFirstParams = await supplyChain.fetchItemFirstParams(upc);
-    const resultSecondParams = await supplyChain.fetchItemSecondParams(upc);
+    const resultLastParams = await supplyChain.fetchItemLastParams(upc);
 
     assert.equal(resultFirstParams[1], upc, "Error: Missing upc");
     assert.equal(resultFirstParams[3], originFarmerId, "Error: Missing originFarmerId");
-    assert.equal(resultSecondParams[4], 0, "Error: Invalid state");
+    assert.equal(resultLastParams[4], 0, "Error: Invalid state");
   });
 
   it("should test the harvestItem() function", async () => {
@@ -79,9 +93,9 @@ contract("SupplyChain", accounts => {
 
     truffleAssert.eventEmitted(event, "Harvested");
 
-    const resultSecondParams = await supplyChain.fetchItemSecondParams(upc);
+    const resultLastParams = await supplyChain.fetchItemLastParams(upc);
 
-    assert.equal(resultSecondParams[4], 1, "Error: Invalid state");
+    assert.equal(resultLastParams[4], 1, "Error: Invalid state");
   });
 
   it("should test the auditItem() function", async () => {
@@ -90,9 +104,9 @@ contract("SupplyChain", accounts => {
 
     truffleAssert.eventEmitted(event, "Audited");
 
-    const resultSecondParams = await supplyChain.fetchItemSecondParams(upc);
+    const resultLastParams = await supplyChain.fetchItemLastParams(upc);
 
-    assert.equal(resultSecondParams[4], 2, "Error: Invalid state");
+    assert.equal(resultLastParams[4], 2, "Error: Invalid state");
   });
 
   it("should test the processItem() function", async () => {
@@ -101,9 +115,9 @@ contract("SupplyChain", accounts => {
 
     truffleAssert.eventEmitted(event, "Processed");
 
-    const resultSecondParams = await supplyChain.fetchItemSecondParams(upc);
+    const resultLastParams = await supplyChain.fetchItemLastParams(upc);
 
-    assert.equal(resultSecondParams[4], 3, "Error: Invalid state");
+    assert.equal(resultLastParams[4], 3, "Error: Invalid state");
   });
 
   it("should test the produceItem() function", async () => {
@@ -112,10 +126,10 @@ contract("SupplyChain", accounts => {
 
     truffleAssert.eventEmitted(event, "Produced");
 
-    const resultSecondParams = await supplyChain.fetchItemSecondParams(upc);
+    const resultLastParams = await supplyChain.fetchItemLastParams(upc);
 
-    assert.equal(resultSecondParams[4], 4, "Error: Invalid state");
-    assert.equal(resultSecondParams[3], price, "Error: Invalid price");
+    assert.equal(resultLastParams[4], 4, "Error: Invalid state");
+    assert.equal(resultLastParams[3], price, "Error: Invalid price");
   });
 
   it("should test the certifyItem() function", async () => {
@@ -124,9 +138,9 @@ contract("SupplyChain", accounts => {
 
     truffleAssert.eventEmitted(event, "Certified");
 
-    const resultSecondParams = await supplyChain.fetchItemSecondParams(upc);
+    const resultLastParams = await supplyChain.fetchItemLastParams(upc);
 
-    assert.equal(resultSecondParams[4], 5, "Error: Invalid state");
+    assert.equal(resultLastParams[4], 5, "Error: Invalid state");
   });
 
   it("should test the packItem() function", async () => {
@@ -135,9 +149,9 @@ contract("SupplyChain", accounts => {
 
     truffleAssert.eventEmitted(event, "Packed");
 
-    const resultSecondParams = await supplyChain.fetchItemSecondParams(upc);
+    const resultLastParams = await supplyChain.fetchItemLastParams(upc);
 
-    assert.equal(resultSecondParams[4], 6, "Error: Invalid state");
+    assert.equal(resultLastParams[4], 6, "Error: Invalid state");
   });
 
   it("should test the sellItem() function", async () => {
@@ -146,10 +160,10 @@ contract("SupplyChain", accounts => {
 
     truffleAssert.eventEmitted(event, "ReadyForSale");
 
-    const resultSecondParams = await supplyChain.fetchItemSecondParams(upc);
+    const resultLastParams = await supplyChain.fetchItemLastParams(upc);
 
-    assert.equal(resultSecondParams[4], 7, "Error: Invalid state");
-    assert.equal(resultSecondParams[8], distributorId, "Error: Invalid distributor id");
+    assert.equal(resultLastParams[4], 7, "Error: Invalid state");
+    assert.equal(resultLastParams[8], distributorId, "Error: Invalid distributor id");
   });
 
   it("should test the buyItem() function", async () => {
@@ -158,9 +172,9 @@ contract("SupplyChain", accounts => {
 
     truffleAssert.eventEmitted(event, "Sold");
 
-    const resultSecondParams = await supplyChain.fetchItemSecondParams(upc);
+    const resultLastParams = await supplyChain.fetchItemLastParams(upc);
 
-    assert.equal(resultSecondParams[4], 8, "Error: Invalid state");
+    assert.equal(resultLastParams[4], 8, "Error: Invalid state");
   });
 
   it("should test the fetchItemFirstParam() function", async () => {
@@ -176,25 +190,21 @@ contract("SupplyChain", accounts => {
     assert.equal(resultFirstParams[5], originFarmInformation, "Error: Invalid originFarmInformation");
     assert.equal(resultFirstParams[6], originFarmLatitude, "Error: Invalid originFarmLatitude");
     assert.equal(resultFirstParams[7], originFarmLongitude, "Error: Invalid originFarmLongitude");
-    assert.equal(resultFirstParams[8], auditNotes, "Error: Invalid auditNotes");
-    assert.equal(resultFirstParams[9], harvestNotes, "Error: Invalid harvestNotes");
   });
 
-  it("should test the fetchItemSecondParam() function", async () => {
+  it("should test the fetchItemLastParam() function", async () => {
     const supplyChain = await SupplyChain.deployed();
 
-    const resultSecondParams = await supplyChain.fetchItemSecondParams(upc);
+    const resultLastParams = await supplyChain.fetchItemLastParams(upc);
 
-    assert.equal(resultSecondParams[0], sku, "Error: Invalid sku");
-    assert.equal(resultSecondParams[1], upc, "Error: Invalid upc");
-    assert.equal(resultSecondParams[2], productId, "Error: Invalid productId");
-    assert.equal(resultSecondParams[3], price, "Error: Invalid price");
-    assert.equal(resultSecondParams[4], 9, "Error: Invalid state");
-    assert.equal(resultSecondParams[5], ownerId, "Error: Invalid ownerId");
-    assert.equal(resultSecondParams[6], producerId, "Error: Invalid producerId");
-    assert.equal(resultSecondParams[7], distributorId, "Error: Invalid distributorId");
-    assert.equal(resultSecondParams[8], consumerId, "Error: Invalid consumerId");
-    assert.equal(resultSecondParams[9], productNotes, "Error: Invalid productNotes");
-    assert.equal(resultSecondParams[10], certifyNotes, "Error: Invalid certifyNotes");
+    assert.equal(resultLastParams[0], sku, "Error: Invalid sku");
+    assert.equal(resultLastParams[1], upc, "Error: Invalid upc");
+    assert.equal(resultLastParams[2], productId, "Error: Invalid productId");
+    assert.equal(resultLastParams[3], price, "Error: Invalid price");
+    assert.equal(resultLastParams[4], 9, "Error: Invalid state");
+    assert.equal(resultLastParams[5], producerId, "Error: Invalid producerId");
+    assert.equal(resultLastParams[6], distributorId, "Error: Invalid distributorId");
+    assert.equal(resultLastParams[7], consumerId, "Error: Invalid consumerId");
+    assert.equal(resultLastParams[8], productNotes, "Error: Invalid productNotes");
   });
 });

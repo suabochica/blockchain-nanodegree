@@ -19,7 +19,7 @@
  */
 
 const HDWallet = require('truffle-hdwallet-provider');
-const infuraKey = "8f0afa0a1ab9431b85f86db7e3170265";
+const infuraKey = "y";
 // const fs = require('fs');
 const mnemonic = "ability sunny gain thought mirror buyer borrow broom drift begin gold coyote";
 
@@ -47,9 +47,9 @@ module.exports = {
     //  network_id: "*",       // Any network (default: none)
     // },
 
-    develop: {
+    development: {
       host: "127.0.0.1",     // Localhost (default: none)
-      port: 9545,            // Standard Ethereum port (default: none)
+      port: 7545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
     },
 

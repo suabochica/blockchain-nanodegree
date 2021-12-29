@@ -1,4 +1,4 @@
-# ND1309 C2 Ethereum Smart Contracts, Tokens and Dapps - Project Starter 
+# 🏋️ Decentralized Star Notary Service Project 
 
 **PROJECT: Decentralized Star Notary Service Project** - For this project, you will create a DApp by adding functionality with your smart contract and deploy it on the public testnet.
 
@@ -88,11 +88,13 @@ compile
 migrate --reset
 
 # For running unit tests the contract, inside the development console, run:
+
 test
 ```
 
 3. Frontend - Once you are ready to start your frontend, run the following from the app folder:
 ```bash
+
 cd app
 npm run dev
 ```

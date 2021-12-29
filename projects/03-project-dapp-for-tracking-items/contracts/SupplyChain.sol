@@ -154,8 +154,6 @@ contract SupplyChain is
     // Functions
     //----------------------------------
 
-    // function kill() public onlyOwner {}
-
     function plantItem(
         uint256 _upc,
         uint256 _productId,

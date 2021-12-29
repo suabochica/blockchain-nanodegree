@@ -5,26 +5,6 @@ const App = {
   web3: null,
   account: null,
   supplyChain: null,
-  // emptyAddress: "0x0000000000000000000000000000000000000000",
-  // metaMaskAccountId: "0x0000000000000000000000000000000000000000",
-  // sku: 0,
-  // upc: 0,
-  // productId: 0,
-  // ownerId: "0x0000000000000000000000000000000000000000",
-  // originFarmerId: "0x0000000000000000000000000000000000000000",
-  // originFarmName: "",
-  // originFarmInformation: null,
-  // originFarmLatitude: null,
-  // originFarmLongitude: null,
-  // harvestNotes: "",
-  // auditNotes: "",
-  // producerId: "0x0000000000000000000000000000000000000000",
-  // price: 0,
-  // productNotes: "",
-  // certifyNotes: "",
-  // distributorId: "0x0000000000000000000000000000000000000000",
-  // consumerId: "0x0000000000000000000000000000000000000000",
-
 
   start: async function () {
     const { web3 } = this;
@@ -42,66 +22,9 @@ const App = {
       const accounts = await web3.eth.getAccounts();
       this.account = accounts[0];
 
-      // this.readForm();
     } catch (error) {
       console.error("Could not connect to contract or chain.");
     }
-  },
-
-  // readForm: function () {
-  //   App.sku = document.getElementById("sku").value;
-  //   App.upc = document.getElementById("upc").value;
-  //   App.productId = document.getElementById("productId").value;
-  //   App.ownerId = document.getElementById("ownerId").value;
-  //   App.originFarmerId = document.getElementById("originFarmerId").value;
-  //   App.originFarmName = document.getElementById("originFarmName").value;
-  //   App.originFarmInformation = document.getElementById("originFarmInformation").value;
-  //   App.originFarmLatitude = document.getElementById("originFarmLatitude").value;
-  //   App.originFarmLongitude = document.getElementById("originFarmLongitude").value;
-  //   App.harvestNotes = document.getElementById("harvestNotes").value;
-  //   App.auditNotes = document.getElementById("auditNotes").value;
-  //   App.producerId = document.getElementById("producerId").value;
-  //   App.price = document.getElementById("price").value;
-  //   App.productNotes = document.getElementById("productNotes").value;
-  //   App.certifyNotes = document.getElementById("certifyNotes").value;
-  //   App.distributorId = document.getElementById("distributorId").value;
-  //   App.consumerId = document.getElementById("consumerId").value;
-
-  //   console.log("sku:", App.sku);
-  //   console.log("upc:", App.upc);
-  //   console.log("productId:", App.productId);
-  //   console.log("ownerId:", App.ownerId);
-  //   console.log("originFarmerId:", App.originFarmerId);
-  //   console.log("originFarmName:", App.originFarmName);
-  //   console.log("originFarmInformation:", App.originFarmInformation);
-  //   console.log("originFarmLatitude:", App.originFarmLatitude);
-  //   console.log("originFarmLongitude:", App.originFarmLongitude);
-  //   console.log("harvestNotes:", App.harvestNotes);
-  //   console.log("auditNotes:", App.auditNotes);
-  //   console.log("producerId:", App.producerId);
-  //   console.log("price:", App.price);
-  //   console.log("productNotes:", App.productNotes);
-  //   console.log("certifyNotes:", App.certifyNotes);
-  //   console.log("distributorId:", App.distributorId);
-  //   console.log("consumerId:", App.consumerId);
-  // },
-
-  sendCoin: async function () {
-    const amount = parseInt(document.getElementById("amount").value);
-    const receiver = document.getElementById("receiver").value;
-
-    this.setStatus("Initiating transaction... (please wait)");
-
-    const { sendCoin } = this.meta.methods;
-    await sendCoin(receiver, amount).send({ from: this.account });
-
-    this.setStatus("Transaction complete!");
-    this.refreshBalance();
-  },
-
-  setStatus: function (message) {
-    const status = document.getElementById("status");
-    status.innerHTML = message;
   },
 
   bindClickEvent: function () {
@@ -111,7 +34,7 @@ const App = {
   handleButtonClick: async function (event) {
     event.preventDefault();
 
-    let statusId = parseInt(event.target.getAttribute('data-id'));
+    let statusId = event.target.getAttribute('data-id');
     console.log("statusId", statusId);
 
     switch (statusId) {
@@ -146,7 +69,10 @@ const App = {
         return await this.fetchItemFirstParams(event);
         break;
       case 11:
-        return await this.fetchItemSecondParams(event);
+        return await this.fetchItemLastParams(event);
+        break;
+      case 12:
+        return await this.fetchEvents();
         break;
     }
   },
@@ -185,7 +111,7 @@ const App = {
     const ownerId = document.getElementById("ownerId").value;
     const harvestNotes = document.getElementById("harvestNotes").value;
 
-    let statusId = parseInt(event.target.getAttribute('data-id'));
+    let statusId = event.target.getAttribute('data-id');
     statusId = parseInt(statusId);
 
     const { harvestItem } = this.supplyChain.methods;
@@ -202,7 +128,7 @@ const App = {
     const upc = document.getElementById("upc").value;
     const auditNotes = document.getElementById("auditNotes").value;
 
-    let statusId = parseInt(event.target.getAttribute('data-id'));
+    let statusId = event.target.getAttribute('data-id');
     statusId = parseInt(statusId);
 
     const { auditItem } = this.supplyChain.methods;
@@ -214,7 +140,7 @@ const App = {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
-    let statusId = parseInt(event.target.getAttribute('data-id'));
+    let statusId = event.target.getAttribute('data-id');
     statusId = parseInt(statusId);
 
     const { processItem } = this.supplyChain.methods;
@@ -230,7 +156,7 @@ const App = {
     const productNotes = document.getElementById("productNotes").value;
     const price = document.getElementById("price").value;
 
-    let statusId = parseInt(event.target.getAttribute('data-id'));
+    let statusId = event.target.getAttribute('data-id');
     statusId = parseInt(statusId);
 
     const { produceItem } = this.supplyChain.methods;
@@ -247,7 +173,7 @@ const App = {
     const certifyNotes = document.getElementById("certifyNotes").value;
 
     const upc = document.getElementById("upc").value;
-    let statusId = parseInt(event.target.getAttribute('data-id'));
+    let statusId = event.target.getAttribute('data-id');
     statusId = parseInt(statusId);
 
     const { certifyItem } = this.supplyChain.methods;
@@ -259,7 +185,7 @@ const App = {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
-    let statusId = parseInt(event.target.getAttribute('data-id'));
+    let statusId = event.target.getAttribute('data-id');
     statusId = parseInt(statusId);
 
     const { packItem } = this.supplyChain.methods;
@@ -271,7 +197,7 @@ const App = {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
-    let statusId = parseInt(event.target.getAttribute('data-id'));
+    let statusId = event.target.getAttribute('data-id');
     statusId = parseInt(statusId);
 
     const { sellItem } = this.supplyChain.methods;
@@ -283,7 +209,7 @@ const App = {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
-    let statusId = parseInt(event.target.getAttribute('data-id'));
+    let statusId = event.target.getAttribute('data-id');
     statusId = parseInt(statusId);
 
     const { buyItem } = this.supplyChain.methods;
@@ -295,7 +221,7 @@ const App = {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
-    let statusId = parseInt(event.target.getAttribute('data-id'));
+    let statusId = event.target.getAttribute('data-id');
     statusId = parseInt(statusId);
 
     const { fetchItemFirstParams } = this.supplyChain.methods;
@@ -303,17 +229,34 @@ const App = {
     await fetchItemFirstParams(upc).send({ from: this.account });
   },
 
-  fetchItemSecondParams: async function (event) {
+  fetchItemLastParams: async function (event) {
     event.preventDefault();
 
     const upc = document.getElementById("upc").value;
-    let statusId = parseInt(event.target.getAttribute('data-id'));
+    let statusId = event.target.getAttribute('data-id');
     statusId = parseInt(statusId);
 
-    const { fetchItemSecondParams } = this.supplyChain.methods;
+    const { fetchItemLastParams } = this.supplyChain.methods;
 
-    await fetchItemSecondParams(upc).send({ from: this.account });
+    await fetchItemLastParams(upc).send({ from: this.account });
   },
+
+  fetchEvents: async function () {
+    const { currentProvider } = this.supplyChain;
+    const { sendAsync } = this.supplyChain.currentProvider;
+    const history = document.getElementById("recorded-events");
+
+    if (typeof sendAsync !== "function") {
+      sendAsync = function () {
+        return currentProvider.send.apply(currentProvider, args);
+      }
+    }
+
+    const { allEvents } = this.supplyChain
+    await allEvents(error, log)
+
+    history.appendChild('<li>' + log.event + ' - ' + log.transactionHash + '</li>');
+  }
 };
 
 window.App = App;
