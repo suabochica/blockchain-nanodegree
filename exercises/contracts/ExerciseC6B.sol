@@ -44,16 +44,20 @@ contract ExerciseC6B {
     }
 
     modifier entracyGuard() {
-        counter.add(1)
+        counter.add(1);
         uint256 guard = counter;
         _;
-        require(counter == guard "Entracy guard not allow it");
+        require(counter == guard, "Entracy guard not allow it");
     }
 
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
-    function safeWithdraw(uint256 amount) external rateLimit(30 minutes) entracyGuard() {
+    function safeWithdraw(uint256 amount)
+        external
+        rateLimit(30 minutes)
+        entracyGuard
+    {
         require(msg.sender == tx.origin, "Contracts not allowed");
         require(sales[msg.sender] >= amount, "Insufficient funds");
 
