@@ -62,7 +62,6 @@ contract ExerciseC6B {
         require(sales[msg.sender] >= amount, "Insufficient funds");
 
         uint256 amount = sales[msg.sender];
-        sender[msg.sender] = sales[msg.sender].sub(amount);
 
         msg.sender.transfer(amount);
     }
