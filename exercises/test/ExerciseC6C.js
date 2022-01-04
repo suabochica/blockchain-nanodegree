@@ -25,7 +25,4 @@ contract('ExerciseC6C', async (accounts) => {
         assert.equal(bonus.toNumber(), expectedBonus, "Calculated bonus is incorrect incorrect");
 
     });
-
-
-
 });
