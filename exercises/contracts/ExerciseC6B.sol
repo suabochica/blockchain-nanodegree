@@ -53,16 +53,4 @@ contract ExerciseC6B {
     /********************************************************************************************/
     /*                                     SMART CONTRACT FUNCTIONS                             */
     /********************************************************************************************/
-    function safeWithdraw(uint256 amount)
-        external
-        rateLimit(30 minutes)
-        entracyGuard
-    {
-        require(msg.sender == tx.origin, "Contracts not allowed");
-        require(sales[msg.sender] >= amount, "Insufficient funds");
-
-        uint256 amount = sales[msg.sender];
-
-        msg.sender.transfer(amount);
-    }
 }

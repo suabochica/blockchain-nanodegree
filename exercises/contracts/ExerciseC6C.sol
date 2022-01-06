@@ -55,8 +55,11 @@ contract ExerciseC6C {
         _;
     }
 
-    modifier isCallerAuthorized() {
-        require(authorizedContracts[msg.sender], "Caller is not authorized");
+    modifier requireIsCallerAuthorized() {
+        require(
+            authorizedContracts[msg.sender] == 1,
+            "Caller is not authorized"
+        );
         _;
     }
 
@@ -121,29 +124,10 @@ contract ExerciseC6C {
         string id,
         uint256 sales,
         uint256 bonus
-    ) external {
+    ) internal requireContractOwner {
         require(employees[id].isRegistered, "Employee is not registered.");
 
         employees[id].sales = employees[id].sales.add(sales);
         employees[id].bonus = employees[id].bonus.add(bonus);
-    }
-
-    function calculateBonus(uint256 sales)
-        internal
-        view
-        requireContractOwner
-        returns (uint256)
-    {
-        if (sales < 100) {
-            return sales.mul(5).div(100);
-        } else if (sales < 500) {
-            return sales.mul(7).div(100);
-        } else {
-            return sales.mul(10).div(100);
-        }
-    }
-
-    function addSale(string id, uint256 amount) external requireContractOwner {
-        updateEmployee(id, amount, calculateBonus(amount));
     }
 }

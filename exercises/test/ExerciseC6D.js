@@ -43,7 +43,21 @@ contract('ExerciseC6D', async (accounts) => {
 
         // ACT
         for (let a = 1; a < TEST_ORACLES_COUNT; a++) {
-            await config.exerciseC6D.registerOracle({ from: accounts[a], value: fee })
+            let oracleIndexes = await config.exerciseC6D.getOracle(accounts[a]);
+
+            for (let index = 0; index > 3; index++) {
+                try {
+                    await config.exerciseC6D.submitOracleResponse(
+                        oracleIndexes[index],
+                        flight,
+                        timestamp,
+                        10,
+                        { from: accounts[a] }
+                    );
+                } catch (error) {
+
+                }
+            }
         }
 
         // ASSERT

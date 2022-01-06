@@ -10,10 +10,10 @@ contract ExerciseC6D {
     using SafeMath for uint256; // Allow SafeMath functions to be called for all uint256 types (similar to "prototype" in Javascript)
     address private contractOwner;
     uint8 private nonce = 0;
-    uin256 public constant REGISTRATION_FEE = 1 ether;
-    uin256 public constant MIN_RESPONSE = 3;
-    uin256 public constant ON_TIME = 10;
-    uin256 public constant NOT_ON_TIME = 99;
+    uint256 public constant REGISTRATION_FEE = 1 ether;
+    uint256 public constant MIN_RESPONSES = 3;
+    uint256 public constant ON_TIME = 10;
+    uint256 public constant NOT_ON_TIME = 99;
 
     struct ResponseInfo {
         address requester;
@@ -27,8 +27,8 @@ contract ExerciseC6D {
     }
 
     mapping(address => uint8[3]) private oracles;
-    mapping(bytes32 => ResponseInfo) private oracleResponse;
-    mapping(byte32 => FlightStatus) FlightStatus;
+    mapping(bytes32 => ResponseInfo) private oracleResponses;
+    mapping(bytes32 => FlightStatus) flights;
 
     event FlightStatusInfo(
         string flight,
@@ -67,7 +67,7 @@ contract ExerciseC6D {
     function registerOracle() external payable {
         // CODE EXERCISE 1: Require registration fee
         /* Enter code here */
-        require(msg.value >= REGISTRATRION_FEE, "Registration fee is required");
+        require(msg.value >= REGISTRATION_FEE, "Registration fee is required");
         // CODE EXERCISE 1: Generate three random indexes (range 0-9) using generateIndexes for the calling oracle
         /* Enter code here */
         uint8[3] memory indexes = generateIndexes(msg.sender);
@@ -96,7 +96,7 @@ contract ExerciseC6D {
         // Generate a number between 0 - 9 to determine which oracles may respond
 
         // CODE EXERCISE 2: Replace the hard-coded value of index with a random index based on the calling account
-        uint8 index = 0; /* Replace code here */
+        uint8 index = getRandomIndex(msg.sender);
 
         // Generate a unique key for storing the request
         bytes32 key = keccak256(abi.encodePacked(index, flight, timestamp));
@@ -106,7 +106,7 @@ contract ExerciseC6D {
         });
 
         // CODE EXERCISE 2: Notify oracles that match the index value that they need to fetch flight status
-        /* Enter code here */
+        emit OracleRequest(index, flight, timestamp);
     }
 
     /************************************ END: Oracle Data Request ************************************/
@@ -133,7 +133,11 @@ contract ExerciseC6D {
         );
 
         // CODE EXERCISE 3: Require that the response is being submitted for a request that is still open
-        bytes32 key = 0; /* Replace 0 with code to generate a key using index, flight and timestamp */
+        bytes32 key = keccak256(abi.encodePacked(index, flight, timestamp));
+        require(
+            oracleResponses[key].isOpen,
+            "Flight or timestamp do not match oracle request"
+        );
 
         oracleResponses[key].responses[statusId].push(msg.sender);
 
@@ -141,7 +145,7 @@ contract ExerciseC6D {
         // oracles respond with the *** same *** information
         if (oracleResponses[key].responses[statusId].length >= MIN_RESPONSES) {
             // CODE EXERCISE 3: Prevent any more responses since MIN_RESPONSE threshold has been reached
-            /* Enter code here */
+            emit FlightStatusInfo(flight, timestamp, statusId, true);
 
             // CODE EXERCISE 3: Announce to the world that verified flight status information is available
             /* Enter code here */
@@ -152,7 +156,7 @@ contract ExerciseC6D {
         } else {
             // Oracle submitting response but MIN_RESPONSES threshold not yet reached
             // CODE EXERCISE 3: Announce to the world that verified flight status information is available
-            /* Enter code here */
+            emit FlightStatusInfo(flight, timestamp, statusId, false);
         }
     }
 
