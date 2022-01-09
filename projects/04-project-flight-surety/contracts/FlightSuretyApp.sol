@@ -103,6 +103,90 @@ contract FlightSuretyApp {
         _;
     }
 
+    modifier requireRegisteredAirlineCaller() {
+        require(
+            fligthData.isAirlineRegistered(msg.sender) == true,
+            "Only an existing airline may register an airline"
+        );
+        _;
+    }
+
+    modifier requireFunderAirlineCaller() {
+        require(
+            fligthData.isAirlineFunded(msg.sender) == true,
+            "Only a funded airline may register an airline"
+        );
+        _;
+    }
+
+    modifier requireNominated(address airlineAddres) {
+        require(
+            flightData.isAirlineNominated(airlineAddress) == true,
+            "Airline cannot be nominated"
+        );
+        _;
+    }
+
+    modifier requireNotRegistered(address airlineAddress) {
+        require(
+            flightData.isAirlineRegistered(airlineAddress) != true,
+            "Airline is already registered"
+        );
+        _;
+    }
+
+    modifier requireNotFunded(address airlineAddress) {
+        require(
+            flightData.isAirlineFunded(airlineAddress) != true,
+            "Airline is already funded"
+        );
+        _;
+    }
+
+    modifier requireFlightRegistered(
+        address airline,
+        string memory flight,
+        uint256 departureTime
+    ) {
+        require(
+            isFlightRegistered(airline, flight, departureTime) == true,
+            "Flight must be registered"
+        );
+        _;
+    }
+
+    modifier rejectOverpayment() {
+        require(
+            msg.valuie <= MAX_INSURANCE_AMOUNT,
+            "A max of 1 ether should be sent to purchase insurance"
+        );
+        _;
+    }
+
+    modifier requireSufficentReserves(
+        address airlineAddress,
+        uint256 insuranceAmount
+    ) {
+        uint256 grossExposure = flightData
+            .totalUnderwritten(airlineAddress)
+            .add(insuranceAmount)
+            .mul(3)
+            .div(2);
+        require(
+            grossExposure <= flightData.amountAirlineFunds(airlineAddress),
+            "Airline has insufficent reserves"
+        );
+        _;
+    }
+
+    modifier requrieRegisteredOracle(address oracleAddress) {
+        require(
+            oracles[oracleAddress].isRegistered == true,
+            "Oracle must be registered to submit response"
+        );
+        _;
+    }
+
     //----------------------------------
     // Constructor
     //----------------------------------
