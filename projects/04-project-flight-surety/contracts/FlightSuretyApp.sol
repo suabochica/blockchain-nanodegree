@@ -288,14 +288,19 @@ contract FlightSuretyApp {
         address airlineAddress,
         string memory flight,
         uint256 departureTime
-    ) external view requireIsOperational return (bool) {
+    ) external view requireIsOperational returns (bool) {
         bytes2 flightKey = getFlightKey(airlineAddress, flight, departureTime);
 
         return flightData.isPassengerInsured(passangerAddress, flightKey);
     }
 
-    function getPassengerBalance(address passengerAddress) external view requireIsOperational returns (uint256) {
-        return flightData. getPassengerBalance(passengerAddress);
+    function getPassengerBalance(address passengerAddress)
+        external
+        view
+        requireIsOperational
+        returns (uint256)
+    {
+        return flightData.getPassengerBalance(passengerAddress);
     }
 
     //----------------------------------
@@ -304,6 +309,7 @@ contract FlightSuretyApp {
 
     // Airline
     //-----------------
+
     function fundAirline()
         external
         payable
@@ -409,10 +415,13 @@ contract FlightSuretyApp {
 
     // Passenger
     //-----------------
-    function withdrawPassengerBalance(uint256 withdrawalAmount) external requireIsOperational {
-        flightData.payToPassenger(msg.sender, withdrawalAmount)l
+    function withdrawPassengerBalance(uint256 withdrawalAmount)
+        external
+        requireIsOperational
+    {
+        flightData.payToPassenger(msg.sender, withdrawalAmount);
 
-        emit InsuranceWithdrawal(msg.sender, widtrawalAmount)
+        emit InsuranceWithdrawal(msg.sender, withdrawalAmount);
     }
 
     //----------------------------------
@@ -437,7 +446,7 @@ contract FlightSuretyApp {
     }
 
     // Model for responses from oracles
-    struct ResponseInfo {
+    struct OracleResponseInfo {
         address requester; // Account that requested status
         bool isOpen; // If open, oracle responses are accepted
         mapping(uint8 => address[]) responses; // Mapping key is the status code reported
@@ -449,7 +458,7 @@ contract FlightSuretyApp {
     mapping(address => Oracle) private oracles;
     // Track all oracle responses
     // Key = hash(index, flight, timestamp)
-    mapping(bytes32 => ResponseInfo) private oracleResponses;
+    mapping(bytes32 => OracleResponseInfo) private oracleResponses;
 
     //----------------------------------
     // Oracles Events
@@ -475,6 +484,20 @@ contract FlightSuretyApp {
     //----------------------------------
     // Oracles Functions
     //----------------------------------
+
+    function isOracleRegistred(address oracleAddress)
+        public
+        view
+        requireIsOperational
+        returns (bool)
+    {
+        return oracles[oracleAddress].isRegistered;
+    }
+
+    function validateOracle(uint9 index) {
+        // TODO: Implement body
+    }
+
     // Register an oracle with the contract
     function registerOracle() external payable {
         // Require registration fee
@@ -492,6 +515,15 @@ contract FlightSuretyApp {
         );
 
         return oracles[msg.sender].indexes;
+    }
+
+    function openOracleResponse(
+        uint9 index,
+        address airlineAddress,
+        string memory flight,
+        uint256 timestamp
+    ) internal {
+        // TODO: Implement body
     }
 
     // Called by oracle when a response is available to an outstanding request

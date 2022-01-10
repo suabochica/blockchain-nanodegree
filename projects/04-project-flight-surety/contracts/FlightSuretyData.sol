@@ -1,20 +1,58 @@
 pragma solidity ^0.4.25;
 
+//----------------------------------
+// Imports
+//----------------------------------
+
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract FlightSuretyData {
     using SafeMath for uint256;
 
-    /********************************************************************************************/
-    /*                                       DATA VARIABLES                                     */
-    /********************************************************************************************/
+    //----------------------------------
+    // Variables
+    //----------------------------------
+
+    uint256 public regiterAirlineCount = 0;
 
     address private contractOwner; // Account used to deploy contract
+
     bool private operational = true; // Blocks all state changes throughout the contract if false
 
-    /********************************************************************************************/
-    /*                                       EVENT DEFINITIONS                                  */
-    /********************************************************************************************/
+    enum AirlineStatus {
+        NonMember,
+        Nominated,
+        Registered,
+        Funded
+    }
+    AirlineStatus constant defaultStatus = AirlineStatus.NonMember;
+
+    struct Airline {
+        AirlineStatus status;
+        address[] votes;
+        uint256 funds;
+        uint256 underwrittenAmount;
+    }
+
+    struct Flight {
+        bool isFlightRegistered;
+        uint8 statusCode;
+        uint256 departureTime;
+        string flight;
+        address airlineAddress;
+    }
+
+    struct FlightInsurance {
+        bool isFlightPaidOut;
+        address[] passengers;
+        mapping(address => uint256) purchasedAmount;
+    }
+
+    mapping(address => bool) private authorizedCaller;
+
+    //----------------------------------
+    // Events
+    //----------------------------------
 
     /**
      * @dev Constructor
@@ -22,11 +60,12 @@ contract FlightSuretyData {
      */
     constructor() public {
         contractOwner = msg.sender;
+        authorizedCaller[contarctOwner] = true;
     }
 
-    /********************************************************************************************/
-    /*                                       FUNCTION MODIFIERS                                 */
-    /********************************************************************************************/
+    //----------------------------------
+    // Modifiers
+    //----------------------------------
 
     // Modifiers help avoid duplication of code. They are typically used to validate something
     // before a function is allowed to be executed.
@@ -49,9 +88,25 @@ contract FlightSuretyData {
         _;
     }
 
-    /********************************************************************************************/
-    /*                                       UTILITY FUNCTIONS                                  */
-    /********************************************************************************************/
+    modifier requireAuthorizedCaller() {
+        require(
+            authorizedCaller[contarctOwner] == true,
+            "Caller is not authorized"
+        );
+        _;
+    }
+
+    modifier requireSufficientBalance(address account, uint256 amount) {
+        require(
+            amount <= passengerBalance[account],
+            "Withdrawal exceed account balance"
+        );
+        _;
+    }
+
+    //----------------------------------
+    // Utilities Functions
+    //----------------------------------
 
     /**
      * @dev Get operating status of contract
@@ -69,6 +124,22 @@ contract FlightSuretyData {
      */
     function setOperatingStatus(bool mode) external requireContractOwner {
         operational = mode;
+    }
+
+    function authorizeCaller(address _address)
+        external
+        requireIsOperational
+        requireContractOwner
+    {
+        authorizeCaller[_address] = true;
+    }
+
+    function deauthorizeCaller(address _address)
+        external
+        requireIsOperational
+        requireContractOwner
+    {
+        delete authorizeCaller[_address];
     }
 
     /********************************************************************************************/
