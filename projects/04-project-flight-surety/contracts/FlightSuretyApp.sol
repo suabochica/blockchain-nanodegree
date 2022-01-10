@@ -205,6 +205,9 @@ contract FlightSuretyApp {
         return flightData.setOperationalStatus(mode);
     }
 
+    // Airline
+    //-----------------
+
     function isAirlineFunded(address airlineAddress)
         external
         view
@@ -241,10 +244,66 @@ contract FlightSuretyApp {
         return flightData.getAirlineMembership(airlineAddress);
     }
 
+    // Flight
+    //-----------------
+
+    function isFlightRegistered(
+        address airlineAddress,
+        string memory flight,
+        uint256 departureTime
+    ) public view requireIsOperational returns (bool) {
+        bytes32 flightKey = getFlightKey(airlineAddress, flight, departureTime);
+
+        return flightData.isFlightRegistered(flightKey);
+    }
+
+    function isFlightPaidOut(
+        address airlineAddress,
+        string memory flight,
+        uint256 departureTime
+    ) public view requireIsOperational returns (bool) {
+        bytes32 flightKey = getFlightKey(airlineAddress, flight, departureTime);
+
+        return flightData.isFlightPaidOut(flightKey);
+    }
+
+    /**
+     * @dev Get a future flight for insuring.
+     */
+    function getFlightStatus(
+        address airlineAddress,
+        string memory flight,
+        uint256 departureTime
+    ) external view requireIsOperational returns (uint8) {
+        bytes32 flightKey = getFlightKey(airlineAddress, flight, departureTime);
+
+        return flightData.getFlightStatus(flightKey);
+    }
+
+    // Passenger
+    //-----------------
+
+    function isPassengerInsured(
+        address passengerAddress,
+        address airlineAddress,
+        string memory flight,
+        uint256 departureTime
+    ) external view requireIsOperational return (bool) {
+        bytes2 flightKey = getFlightKey(airlineAddress, flight, departureTime);
+
+        return flightData.isPassengerInsured(passangerAddress, flightKey);
+    }
+
+    function getPassengerBalance(address passengerAddress) external view requireIsOperational returns (uint256) {
+        return flightData. getPassengerBalance(passengerAddress);
+    }
+
     //----------------------------------
     // Smart Contract Functions
     //----------------------------------
 
+    // Airline
+    //-----------------
     function fundAirline()
         external
         payable
@@ -282,10 +341,33 @@ contract FlightSuretyApp {
         emit AirlineNominated(airlineAddress);
     }
 
+    function getAirlineVotes(address airlineAddress)
+        external
+        view
+        requireIsOperational
+        returns (uint256 votes)
+    {
+        // TODO: Implement body
+    }
+
+    function getAirlineFundsAmount(address airlineAddress)
+        external
+        view
+        requireIsOperational
+        returns (uint256 amount)
+    {
+        // TODO: Implement body
+    }
+
+    // Flight
+    //-----------------
+
     /**
      * @dev Register a future flight for insuring.
      */
-    function registerFlight() external pure {}
+    function registerFlight() external pure {
+        // TODO: Implement body
+    }
 
     /**
      * @dev Called after oracle has updated flight status
@@ -315,6 +397,22 @@ contract FlightSuretyApp {
         });
 
         emit OracleRequest(index, airline, flight, timestamp);
+    }
+
+    function buyFlightInsurance(
+        address airlineAddress,
+        string memory flight,
+        uint256 departureTime
+    ) {
+        // TODO: Implement body
+    }
+
+    // Passenger
+    //-----------------
+    function withdrawPassengerBalance(uint256 withdrawalAmount) external requireIsOperational {
+        flightData.payToPassenger(msg.sender, withdrawalAmount)l
+
+        emit InsuranceWithdrawal(msg.sender, widtrawalAmount)
     }
 
     //----------------------------------
