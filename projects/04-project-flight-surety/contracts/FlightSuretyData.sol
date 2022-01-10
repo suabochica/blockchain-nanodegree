@@ -117,6 +117,41 @@ contract FlightSuretyData {
         return operational;
     }
 
+    function isAirlineFunded(address airlineAddress)
+        external
+        view
+        requireIsOperational
+        requireAuthorizedCaller
+        returns (bool)
+    {
+        return airlines[airlineAddress].status == AirlineStatusFunded;
+    }
+
+    function isAirlineRegistered(address airlineAddress)
+        external
+        view
+        requireIsOperational
+        requireAuthorizedCaller
+        returns (bool)
+    {
+        return
+            airlines[airlineAddress].status == AirlineStatusRegistered ||
+            airlines[airlineAddress].status == AirlineStatusFunded;
+    }
+
+    function isAirlineNominated(address airlineAddress)
+        external
+        view
+        requireIsOperational
+        requireAuthorizedCaller
+        returns (bool)
+    {
+        return
+            airlines[airlineAddress].status == AirlineStatusNominated ||
+            airlines[airlineAddress].status == AirlineStatusRegistered ||
+            airlines[airlineAddress].status == AirlineStatusFunded;
+    }
+
     /**
      * @dev Sets contract operations on/off
      *
@@ -142,22 +177,106 @@ contract FlightSuretyData {
         delete authorizeCaller[_address];
     }
 
-    /********************************************************************************************/
-    /*                                     SMART CONTRACT FUNCTIONS                             */
-    /********************************************************************************************/
+    function getAirlineVotes(address airlineAddress)
+        external
+        view
+        requireIsOperational
+        requireAuthorizedCaller
+        returns (uint256)
+    {
+        return airlines[airlineAddress].votes.length;
+    }
+
+    function getAirlineFundsAmount(address airlineAddress)
+        external
+        view
+        requireIsOperational
+        requireAuthorizedCaller
+        returns (uint256)
+    {
+        return airlines[airlineAddress].funds;
+    }
+
+    function getAirlineMembership(address airlineAddress)
+        external
+        view
+        requireIsOperational
+        returns (uint256)
+    {
+        return uint256(arilines[airlineAddress].status);
+    }
+
+    //----------------------------------
+    // Smart Contract Functions
+    //----------------------------------
+
+    // Airline
+    //-----------------
+    function nominateAirline(address airlineAddress)
+        external
+        requireIsOperational
+        requireAuthorizedCaller
+    {
+        // Check Airline struct
+        airlines[airlineAddress] = Airline(
+            AirlineStatus.Nominated,
+            new address[](0),
+            0,
+            0
+        );
+    }
+
+    function registerAirline() external pure {
+        // TODO: implement body
+    }
+
+    function voteAirline(address airlineAddress, address voteAddress)
+        external
+        requireIsOperational
+        requireAuthorizedCaller
+        returns (uint256)
+    {
+        airlines[airlineAddress].votes.push(voteAddress);
+
+        return airlines[airlineAddress].votes.length;
+    }
+
+    function fundAirline(address airlineAddress, uint256 fundingAmount)
+        external
+        requireIsOperational
+        requireAuthorizedCaller
+    {
+        // TODO: implement body
+    }
+
+    // Flight
+    //-----------------
+
+    function registerFlight(
+        address airlineAddress,
+        string flight,
+        uint256 departureTime,
+        uint8 statusCode
+    ) external requireIsOprational requireAuthorizedCaller returns (bool) {
+        // TODO: implement body
+    }
+
+    function updateFlightStatus(uint8 statusCode, bytes32 flightKey)
+        external
+        view
+        requireIsOperaional
+        requireAuhtorizedCaller
+        returns (bool)
+    {
+        return flights[flightKey].statusCode = statusCode;
+    }
 
     /**
-     * @dev Add an airline to the registration queue
-     *      Can only be called from FlightSuretyApp contract
-     *
-     */
-    function registerAirline() external pure {}
 
-    /**
      * @dev Buy insurance for a flight
      *
      */
-    function buy() external payable {}
+    function buyFlightInsurance() external payable {}
 
     /**
      *  @dev Credits payouts to insurees
