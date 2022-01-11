@@ -73,20 +73,12 @@ contract FlightSuretyApp {
     // Modifiers help avoid duplication of code. They are typically used to validate something
     // before a function is allowed to be executed.
 
-    /**
-     * @dev Modifier that requires the "operational" boolean variable to be "true"
-     *      This is used on all state changing functions to pause the contract in
-     *      the event there is an issue that needs to be fixed
-     */
     modifier requireIsOperational() {
         // Modify to call data contract's status
         require(true, "Contract is currently not operational");
         _; // All modifiers require an "_" which indicates where the function body will be added
     }
 
-    /**
-     * @dev Modifier that requires the "ContractOwner" account to be the function caller
-     */
     modifier requireContractOwner() {
         require(msg.sender == contractOwner, "Caller is not contract owner");
         _;
@@ -180,16 +172,12 @@ contract FlightSuretyApp {
     // Constructor
     //----------------------------------
 
-    /**
-     * @dev Contract constructor
-     *
-     */
     constructor() public {
         contractOwner = msg.sender;
     }
 
     //----------------------------------
-    // Utilities Functions
+    // Functions
     //----------------------------------
 
     // Modify to call data contract's status
@@ -243,72 +231,6 @@ contract FlightSuretyApp {
     {
         return flightData.getAirlineMembership(airlineAddress);
     }
-
-    // Flight
-    //-----------------
-
-    function isFlightRegistered(
-        address airlineAddress,
-        string memory flight,
-        uint256 departureTime
-    ) public view requireIsOperational returns (bool) {
-        bytes32 flightKey = getFlightKey(airlineAddress, flight, departureTime);
-
-        return flightData.isFlightRegistered(flightKey);
-    }
-
-    function isFlightPaidOut(
-        address airlineAddress,
-        string memory flight,
-        uint256 departureTime
-    ) public view requireIsOperational returns (bool) {
-        bytes32 flightKey = getFlightKey(airlineAddress, flight, departureTime);
-
-        return flightData.isFlightPaidOut(flightKey);
-    }
-
-    /**
-     * @dev Get a future flight for insuring.
-     */
-    function getFlightStatus(
-        address airlineAddress,
-        string memory flight,
-        uint256 departureTime
-    ) external view requireIsOperational returns (uint8) {
-        bytes32 flightKey = getFlightKey(airlineAddress, flight, departureTime);
-
-        return flightData.getFlightStatus(flightKey);
-    }
-
-    // Passenger
-    //-----------------
-
-    function isPassengerInsured(
-        address passengerAddress,
-        address airlineAddress,
-        string memory flight,
-        uint256 departureTime
-    ) external view requireIsOperational returns (bool) {
-        bytes2 flightKey = getFlightKey(airlineAddress, flight, departureTime);
-
-        return flightData.isPassengerInsured(passangerAddress, flightKey);
-    }
-
-    function getPassengerBalance(address passengerAddress)
-        external
-        view
-        requireIsOperational
-        returns (uint256)
-    {
-        return flightData.getPassengerBalance(passengerAddress);
-    }
-
-    //----------------------------------
-    // Smart Contract Functions
-    //----------------------------------
-
-    // Airline
-    //-----------------
 
     function fundAirline()
         external
@@ -368,16 +290,48 @@ contract FlightSuretyApp {
     // Flight
     //-----------------
 
-    /**
-     * @dev Register a future flight for insuring.
-     */
+    function isFlightRegistered(
+        address airlineAddress,
+        string memory flight,
+        uint256 departureTime
+    ) public view requireIsOperational returns (bool) {
+        bytes32 flightKey = getFlightKey(airlineAddress, flight, departureTime);
+
+        return flightData.isFlightRegistered(flightKey);
+    }
+
+    function isFlightInsurancePaidOut(
+        address airlineAddress,
+        string memory flight,
+        uint256 departureTime
+    ) public view requireIsOperational returns (bool) {
+        bytes32 flightKey = getFlightKey(airlineAddress, flight, departureTime);
+
+        return flightData.isFlightInsurancePaidOut(flightKey);
+    }
+
+    function getFlightStatus(
+        address airlineAddress,
+        string memory flight,
+        uint256 departureTime
+    ) external view requireIsOperational returns (uint8) {
+        bytes32 flightKey = getFlightKey(airlineAddress, flight, departureTime);
+
+        return flightData.getFlightStatus(flightKey);
+    }
+
+    function getFlightKey(
+        address airline,
+        string flight,
+        uint256 timestamp
+    ) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked(airline, flight, timestamp));
+    }
+
     function registerFlight() external pure {
         // TODO: Implement body
     }
 
-    /**
-     * @dev Called after oracle has updated flight status
-     */
     function processFlightStatus(
         address airline,
         string memory flight,
@@ -415,6 +369,27 @@ contract FlightSuretyApp {
 
     // Passenger
     //-----------------
+
+    function isPassengerInsured(
+        address passengerAddress,
+        address airlineAddress,
+        string memory flight,
+        uint256 departureTime
+    ) external view requireIsOperational returns (bool) {
+        bytes2 flightKey = getFlightKey(airlineAddress, flight, departureTime);
+
+        return flightData.isPassengerInsured(passangerAddress, flightKey);
+    }
+
+    function getPassengerBalance(address passengerAddress)
+        external
+        view
+        requireIsOperational
+        returns (uint256)
+    {
+        return flightData.getPassengerBalance(passengerAddress);
+    }
+
     function withdrawPassengerBalance(uint256 withdrawalAmount)
         external
         requireIsOperational
@@ -428,9 +403,8 @@ contract FlightSuretyApp {
     // Oracles
     //----------------------------------
 
-    //----------------------------------
     // Oracles Variables
-    //----------------------------------
+    //-----------------
 
     // Incremented to add pseudo-randomness at various points
     uint8 private nonce = 0;
@@ -565,14 +539,6 @@ contract FlightSuretyApp {
             // Handle flight status as appropriate
             processFlightStatus(airline, flight, timestamp, statusCode);
         }
-    }
-
-    function getFlightKey(
-        address airline,
-        string flight,
-        uint256 timestamp
-    ) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(airline, flight, timestamp));
     }
 
     // Returns array of three non-duplicating integers from 0-9
