@@ -41,7 +41,7 @@ contract FlightSuretyData {
     }
 
     struct FlightInsurance {
-        bool isFlightPaidOut;
+        bool isFlightInsurancePaidOut;
         address[] passengers;
         mapping(address => uint256) purchasedAmount;
     }
@@ -213,8 +213,16 @@ contract FlightSuretyData {
         );
     }
 
-    function registerAirline() external pure {
-        // TODO: implement body
+    function registerAirline(address airlineAddress)
+        external
+        requireIsOperational
+        requireAuthorizedCaller
+        returns (bool)
+    {
+        airlines[airlineAddress].status = AirlineStatus.Registered;
+        registeredAirlineCount++;
+
+        return airlines[airlineAddress].status == AirlineStatus.Registered;
     }
 
     function voteAirline(address airlineAddress, address voteAddress)
@@ -232,8 +240,14 @@ contract FlightSuretyData {
         external
         requireIsOperational
         requireAuthorizedCaller
+        returns (unit256)
     {
-        // TODO: implement body
+        airlines[airlineAddress].funds = airlines[airlineAddress].funds.add(
+            fundingAmount
+        );
+        airlines[airlineAddress].status = AirlineStatus.Funded;
+
+        return airlines[airlineAddress].funds;
     }
 
     // Flight
@@ -275,7 +289,16 @@ contract FlightSuretyData {
         uint256 departureTime,
         uint8 statusCode
     ) external requireIsOprational requireAuthorizedCaller returns (bool) {
-        // TODO: implement body
+        bytes32 flightKey = getFlightKey(airlineAddress, flight, departureTime);
+        flights[flightKey] = Flight({
+            isRegistered: true,
+            airline: airlineAddress,
+            flight: flight,
+            departureTime: departureTime,
+            statusCode: statusCode
+        });
+
+        return flights[flightKey].isRegistered;
     }
 
     function updateFlightStatus(uint8 statusCode, bytes32 flightKey)
@@ -296,12 +319,29 @@ contract FlightSuretyData {
         return keccak256(abi.encodePacked(airline, flight, timestamp));
     }
 
-    function buyFlightInsurance() external payable {
-        // TODO: implement body
+    function buyFlightInsurance(
+        address airlineAddress,
+        address passengerAddress,
+        uint256 insuranceAmount,
+        bytes32 flightKey
+    ) external requireIsOperational requireAuthorizedCaller {
+        airlines[airlineAddress].underwrittenAmount.add(insuranceAmount);
+        flightInsurance[flightKey].purchasedAmount[
+            passengerAddress
+        ] = insuranceAmount;
+        flightInsurance[flightKey].passengers.push(passenger);
     }
 
-    function defineCreditInsurees() external pure {
-        // TODO: implement body
+    function defineCreditInsurees(bytes32 flightKey, address airlineAddress)
+        external
+        requireIsOperational
+        requireAuthorizedCaller
+    {
+        require(
+            !flightInsurance[flightKey].isFlightInsurancePaidOut,
+            "Flight insurance already paid out"
+        );
+        // TODO: Implement body
     }
 
     // Passenger
