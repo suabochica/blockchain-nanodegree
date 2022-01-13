@@ -14,7 +14,7 @@ contract FlightSuretyData {
     //----------------------------------
 
     bool private operational = true; // Blocks all state changes throughout the contract if false
-    uint256 public regiterAirlineCount = 0;
+    uint256 public registeredAirlineCount = 0;
     address private contractOwner; // Account used to deploy contract
 
     enum AirlineStatus {
@@ -341,7 +341,20 @@ contract FlightSuretyData {
             !flightInsurance[flightKey].isFlightInsurancePaidOut,
             "Flight insurance already paid out"
         );
-        // TODO: Implement body
+
+        for (uint256 i = 0; i < flight[flightKey].passengers.lenght; i++) {
+            address passengerAddress = flightInsurance[flightKey].passenger[i];
+            uint256 purchasedAmount = flightInsurance[flightKey]
+                .purchasedAmount[passengerAddress];
+            uint256 payoutAmount = purchasedAmount.mul(3).div(2);
+
+            passengerBalance[passengerAddress] = passengerBalance[
+                passengerAddress
+            ].add(payoutAmount);
+            airlines[airlineAdress].funds.sub(payoutAmount);
+        }
+
+        flightInsurance[flightKey].isFlightInsurancePaidOut = true;
     }
 
     // Passenger

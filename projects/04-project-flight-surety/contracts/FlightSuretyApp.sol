@@ -41,7 +41,7 @@ contract FlightSuretyApp {
         bool isRegistered;
         uint8 statusCode;
         uint256 updatedTimestamp;
-        address airline;
+        address airlineAddress;
     }
 
     mapping(bytes32 => Flight) private flights;
@@ -56,7 +56,7 @@ contract FlightSuretyApp {
 
     event FlightRegistered(address indexed airlineAddress, string flight);
     event FlightStatusInfo(
-        address airline,
+        address airlineAddress,
         string flight,
         uint256 departureTime,
         uint9 status
@@ -116,7 +116,7 @@ contract FlightSuretyApp {
         _;
     }
 
-    modifier requireNominated(address airlineAddres) {
+    modifier requireNominated(address airlineAddress) {
         require(
             flightData.isAirlineNominated(airlineAddress) == true,
             "Airline cannot be nominated"
@@ -125,12 +125,12 @@ contract FlightSuretyApp {
     }
 
     modifier requireFlightRegistered(
-        address airline,
+        address airlineAddress,
         string memory flight,
         uint256 departureTime
     ) {
         require(
-            isFlightRegistered(airline, flight, departureTime) == true,
+            isFlightRegistered(airlineAddress, flight, departureTime) == true,
             "Flight must be registered"
         );
         _;
@@ -138,7 +138,7 @@ contract FlightSuretyApp {
 
     modifier rejectOverpayment() {
         require(
-            msg.valuie <= MAX_INSURANCE_AMOUNT,
+            msg.value <= MAX_INSURANCE_AMOUNT,
             "A max of 1 ether should be sent to purchase insurance"
         );
         _;
@@ -172,8 +172,10 @@ contract FlightSuretyApp {
     // Constructor
     //----------------------------------
 
-    constructor() public {
+    constructor(address payable dataContract) public {
         contractOwner = msg.sender;
+        dataContractAddress = dataContract;
+        flightData = FlightSuretyData(dataContract);
     }
 
     //----------------------------------
@@ -252,12 +254,29 @@ contract FlightSuretyApp {
     /**
      * @dev Add an airline to the registration queue
      */
-    function registerAirline()
+    function registerAirline(address airlineAddress)
         external
-        pure
-        returns (bool success, uint256 votes)
+        requireIsOperational
+        requireFundedAirlineCaller
+        requireNotFunded(airlineAddress)
+        requireNotRegistered(airlineAddress)
+        requireNotNominated(airlineAddress)
+        returns (bool success)
     {
-        return (success, 0);
+        uint256 votes = flightData.voteAirline(airlineAddress, msg.sender);
+
+        if (flightData.registerAirlineCount() >= CONSENSUS_THRESHOLD) {
+            if (
+                votes >=
+                flightData.registerAirlineCount().div(VOTE_SUCCESS_THRESHOLD)
+            ) {
+                // TODO:
+            } else {
+                // TODO:
+            }
+        } else {
+            // TODO:
+        }
     }
 
     function nominateAirline(address airlineAddress)
@@ -275,16 +294,16 @@ contract FlightSuretyApp {
         requireIsOperational
         returns (uint256 votes)
     {
-        // TODO: Implement body
+        return flightData.getAirlineVotes(airlineAddress);
     }
 
     function getAirlineFundsAmount(address airlineAddress)
         external
         view
         requireIsOperational
-        returns (uint256 amount)
+        returns (uint256 fundsAmount)
     {
-        // TODO: Implement body
+        return flightData.getAirlineFundsAmount(airlineAddress);
     }
 
     // Flight
