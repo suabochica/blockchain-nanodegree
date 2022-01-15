@@ -124,9 +124,80 @@ contract('Flight Surety Tests', async (accounts) => {
   });
 
   describe("business logic", () => {
-    before("nominate arilines", async () => {
-      // TODO:
-    });
+    describe("an airline can register a new airline until four airlines will registered", () => {
+      before("nominate airlines", async () => {
+        let tx2 = await app.nominateAirline(actors.airline2, { from: actors.airline1 })
+        let tx3 = await app.nominateAirline(actors.airline3, { from: actors.airline1 })
+        let tx4 = await app.nominateAirline(actors.airline4, { from: actors.airline1 })
+        let tx5 = await app.nominateAirline(actors.airline5, { from: actors.airline1 })
+
+        expectEvent(tx2, 'AirlineNominated', {
+          airlineAddress: actors.airline2,
+        });
+
+        expectEvent(tx3, 'AirlineNominated', {
+          airlineAddress: actors.airline3,
+        });
+
+        expectEvent(tx4, 'AirlineNominated', {
+          airlineAddress: actors.airline4,
+        });
+
+        expectEvent(tx5, 'AirlineNominated', {
+          airlineAddress: actors.airline5,
+        });
+      });
+
+      it("should register first airline when contract is deployed", async () => {
+        let transaction = false;
+        let throwError = false;
+
+        try {
+          transaction = await app.isAirlineRegistered(actors.airline1);
+        } catch (error) {
+          throwError = true;
+        }
+
+        assert.equal(transaction, true, "first airline is no registered upon deployment")
+        assert.equal(throwError, false, "unexpected error")
+      });
+
+      it("should not allow that an unregistered airline register a new one", async () => {
+        await expectRevert(
+          app.registerAirline(actors.airline2, { from: actors.airline3 }),
+          'only funded airlines can register a new one'
+        );
+      });
+
+      it("should not allow participate in contract until it submit funding of 10 ether", async () => {
+        await expectRevert(
+          app.registerAirline(actors.airline2, { from: actors.airline1 }),
+          'only funded airlines can register a new one'
+        );
+
+        let fundingAmount = ether('10');
+        let transaction = await app.fundAirline({ from: actors.airline1, value: fundingAmount })
+
+        await expectEvent(transaction, 'AirlineFunded', {
+          airlineAddress: actors.airline1,
+          amount: fundingAmount
+        });
+
+        let result = await app.getAirlineFundsAmount(actors.airline1);
+
+        expect(result).to.be.bignumber.equal(fundingAmount);
+      });
+
+      it("should allow that the first airline register the second one", async () => {
+        let transaction = await app.registerAirline(actors.airline2, { from: actors.airline1 });
+
+        expectEvent(transaction, 'AirlineRegistered', { airlineAddress: actors.airline2 });
+      })
+
+      it("should not register an airline that is already registered", async () => {
+        // TODO:
+      })
+    })
   });
 
 
