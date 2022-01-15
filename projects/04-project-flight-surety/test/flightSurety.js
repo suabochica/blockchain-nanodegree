@@ -13,7 +13,6 @@ const {
 } = require('@openzeppelin/test-helpers')
 
 contract('Flight Surety Tests', async (accounts) => {
-
   let config;
   let data;
   let app;
@@ -70,14 +69,14 @@ contract('Flight Surety Tests', async (accounts) => {
   });
 
   describe("operations and settings", () => {
-    it(`(multiparty) has correct initial isOperational() value`, async function () {
+    it(`has correct initial isOperational() value`, async function () {
       // Get operating status
       let status = await app.isOperational.call();
 
       assert.equal(status, true, "Incorrect initial operating status value");
     });
 
-    it(`(multiparty) can block access to setOperatingStatus() for non-Contract Owner account`, async function () {
+    it(`can block access to setOperatingStatus() for non-Contract Owner account`, async function () {
       // Ensure that access is denied for non-Contract Owner account
       let accessDenied = false;
       try {
@@ -90,7 +89,7 @@ contract('Flight Surety Tests', async (accounts) => {
       assert.equal(accessDenied, true, "Access not restricted to Contract Owner");
     });
 
-    it(`(multiparty) can allow access to setOperatingStatus() for Contract Owner account`, async function () {
+    it(`can allow access to setOperatingStatus() for Contract Owner account`, async function () {
       // Ensure that access is allowed for Contract Owner account
       let accessDenied = false;
       try {
@@ -103,7 +102,7 @@ contract('Flight Surety Tests', async (accounts) => {
       assert.equal(accessDenied, false, "Access not restricted to Contract Owner");
     });
 
-    it(`(multiparty) can block access to functions using requireIsOperational when operating status is false`, async function () {
+    it(`can block access to functions using requireIsOperational when operating status is false`, async function () {
 
       await app.setOperatingStatus(false, { from: config.contractOwner });
 
@@ -195,28 +194,102 @@ contract('Flight Surety Tests', async (accounts) => {
       })
 
       it("should not register an airline that is already registered", async () => {
-        // TODO:
-      })
+        await expectRevert(
+          app.registerAirline(actors.airline2, { from: actors.airline1 }),
+          'Airline is already registered'
+        );
+      });
+
+      it("should allow that the second airline register the third one", async () => {
+        let fundingAmount = ether('10');
+        let transactionToFund = await app.fundAirline({ from: actors.airline2, value: fundingAmount })
+
+        await expectEvent(transactionToFund, 'AirlineFunded', {
+          airlineAddress: actors.airline2,
+          amount: fundingAmount
+        });
+
+        let transactionToRegister = await app.registerAirline(actors.airline3, { from: actors.airline2 });
+
+        expectEvent(transactionToRegister, 'AirlineRegistered', { airlineAddress: actors.airline3 });
+      });
+
+      it("should allow that the third airline register the fourth one", async () => {
+        let fundingAmount = ether('10');
+        let transactionToFund = await app.fundAirline({ from: actors.airline3, value: fundingAmount })
+
+        await expectEvent(transactionToFund, 'AirlineFunded', {
+          airlineAddress: actors.airline3,
+          amount: fundingAmount
+        });
+
+        let transactionToRegister = await app.registerAirline(actors.airline4, { from: actors.airline3 });
+
+        expectEvent(transactionToRegister, 'AirlineRegistered', { airlineAddress: actors.airline4 });
+      });
+    });
+
+    describe("registration after the fifth airline requires multiparty consensus", () => {
+      it("should not allow that the fourth airline register the fifth one without consensus", async () => {
+        let fundingAmount = ether('10');
+        let transactionToFund = await app.fundAirline({ from: actors.airline4, value: fundingAmount })
+
+        await expectEvent(transactionToFund, 'AirlineFunded', {
+          airlineAddress: actors.airline4,
+          amount: fundingAmount
+        });
+
+        let transactionToRegister = await app.registerAirline(actors.airline5, { from: actors.airline4 });
+
+        expectEvent.notEmitted(transactionToRegister, 'AirlineRegistered');
+
+        let votes = await data.getAirlineVotes.call(actors.airline5);
+
+        assert.equal(votes, 1, 'Expect only one vote has been cast for fifth airline')
+      });
+
+      it("should enable registration upon the 50% threshold registered airline votes", async () => {
+        let transactionToRegister = await app.registerAirline(actors.airline5, { from: actors.airline3 });
+
+        expectEvent(transactionToRegister, 'AirlineRegistered', { airlineAddress: actors.airline5 });
+
+        let votes = await data.getAirlineVotes.call(actors.airline5);
+
+        assert.equal(votes, 2, 'Expect two votes has been cast for fifth airline')
+
+        let fundingAmount = ether("10");
+        let transactionToFund = await app.fundAirline({ from: actors.airline5, value: fundingAmount });
+
+        expectEvent(transactionToFund, 'AirlineFunded', {
+          airlineAddress: actors.airline5,
+          amount: fundingAmount
+        });
+      });
+
+      it("should be all the airlines fund", async () => {
+        airlines.forEach(async (airlineAddress) => {
+          let result = await app.isAirlineFunded(airlineAddress);
+
+          assert.equal(result, true);
+        });
+      });
+
+      it("should be 50 ether the data contract balance", async () => {
+        let tracker = await balance.tracker(data.address, uint = 'wei');
+        let expectedEther = ether('50');
+        let actualEther = await tracker.get();
+
+        expect(actualEther).to.be.bignumber.equal(expectedEther);
+      });
     })
-  });
 
+    describe("airlines can register flights and passengers can purchase insurance", () => {
+      it("should each airline be able to register a flight", async () => {
+      });
 
-  it('(airline) cannot register an Airline using registerAirline() if it is not funded', async () => {
+      it("should allow that a passenger purchase insurance on a flight", async () => {
 
-    // ARRANGE
-    let newAirline = accounts[2];
-
-    // ACT
-    try {
-      await config.flightSuretyApp.registerAirline(newAirline, { from: config.firstAirline });
-    }
-    catch (e) {
-
-    }
-    let result = await config.flightSuretyData.isAirline.call(newAirline);
-
-    // ASSERT
-    assert.equal(result, false, "Airline should not be able to register another airline if it hasn't provided funding");
-
+      });
+    })
   });
 });
