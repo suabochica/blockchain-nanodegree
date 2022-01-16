@@ -285,10 +285,46 @@ contract('Flight Surety Tests', async (accounts) => {
 
     describe("airlines can register flights and passengers can purchase insurance", () => {
       it("should each airline be able to register a flight", async () => {
+        flights.forEach(async (flight) => {
+          let flightAirline = flight[0];
+          let flightName = flight[1];
+          let departureTime = flight[2];
+          let transactionToRegister = await app.registerFlight(
+            flightName,
+            departureTime,
+            { from: flightAirline }
+          );
+
+          expectEvent(transactionToRegister, 'FlightRegistered', {
+            airlineAddress: flightAirline,
+            flight: flightName
+          });
+
+          let registrationStatus = await app.isFlightRegistered(flightAirline, flightName, departureTime);
+
+          assert.equal(registrationStatus, true, 'Flight registered');
+        });
       });
 
       it("should allow that a passenger purchase insurance on a flight", async () => {
+        let insuranceAmount = ether('1');
 
+        passengers.forEach(async (passengerAddress, index) => {
+          let flight = flights[index];
+          let flightName = flight[1];
+          let departureTime = flight[2];
+          let transactionToBuy = await app.buyFlightInsurance(
+            flightAirline,
+            flightName,
+            departureTime,
+            { from: passengerAddress, value: insuranceAmount }
+          );
+
+          expectEvent(transactionToBuy, 'InsurancePurchased', {
+            passengerAddress: passengerAddress,
+            amount: insuranceAmount
+          });
+        });
       });
     })
   });
