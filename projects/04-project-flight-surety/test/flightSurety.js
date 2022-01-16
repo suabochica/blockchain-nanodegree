@@ -4,8 +4,6 @@ var BigNumber = require('bignumber.js');
 var { expect, assert } = require('chai');
 
 const {
-  BN,
-  constants,
   expectEvent,
   expectRevert,
   balance,
@@ -17,7 +15,7 @@ contract('Flight Surety Tests', async (accounts) => {
   let data;
   let app;
   let actors;
-  let actorsNames;
+  let actorNames;
   let airlines;
   let flights;
   let passengers;
@@ -28,7 +26,7 @@ contract('Flight Surety Tests', async (accounts) => {
     data = config.flightSuretyData;
     app = config.flightSuretyApp;
     actors = config.actors;
-    actorsName = config.actorsNames;
+    actorNames = config.actorNames;
     airlines = config.airlines;
     flights = config.flights;
     passengers = config.passengers;
@@ -69,14 +67,14 @@ contract('Flight Surety Tests', async (accounts) => {
   });
 
   describe("operations and settings", () => {
-    it(`has correct initial isOperational() value`, async function () {
+    it("has correct initial isOperational() value", async function () {
       // Get operating status
       let status = await app.isOperational.call();
 
       assert.equal(status, true, "Incorrect initial operating status value");
     });
 
-    it(`can block access to setOperatingStatus() for non-Contract Owner account`, async function () {
+    it("can block access to setOperatingStatus() for non-Contract Owner account", async function () {
       // Ensure that access is denied for non-Contract Owner account
       let accessDenied = false;
       try {
@@ -89,7 +87,7 @@ contract('Flight Surety Tests', async (accounts) => {
       assert.equal(accessDenied, true, "Access not restricted to Contract Owner");
     });
 
-    it(`can allow access to setOperatingStatus() for Contract Owner account`, async function () {
+    it("can allow access to setOperatingStatus() for Contract Owner account", async function () {
       // Ensure that access is allowed for Contract Owner account
       let accessDenied = false;
       try {
@@ -102,7 +100,7 @@ contract('Flight Surety Tests', async (accounts) => {
       assert.equal(accessDenied, false, "Access not restricted to Contract Owner");
     });
 
-    it(`can block access to functions using requireIsOperational when operating status is false`, async function () {
+    it("can block access to functions using requireIsOperational when operating status is false", async function () {
 
       await app.setOperatingStatus(false, { from: config.contractOwner });
 
