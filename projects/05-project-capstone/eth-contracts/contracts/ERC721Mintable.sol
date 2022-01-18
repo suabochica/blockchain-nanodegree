@@ -7,7 +7,7 @@ import 'openzeppelin-solidity/contracts/token/ERC721/IERC721Receiver.sol';
 import "./Oraclize.sol";
 
 contract Ownable {
-    //  TODO's: Done
+    //  ✅
     //  1) create a private '_owner' variable of type address with a public getter function
     address private _owner;
 
@@ -45,7 +45,7 @@ contract Ownable {
     }
 }
 
-//  TODO's: Create a Pausable contract that inherits from the Ownable contract: Done
+// ✅ Create a Pausable contract that inherits from the Ownable contract: Done
 contract Pausable is Ownable {
     //  1) create a private '_paused' variable of type bool
     bool private _paused;
@@ -55,12 +55,12 @@ contract Pausable is Ownable {
 
     //  4) create 'whenNotPaused' & 'paused' modifier that throws in the appropriate situation
     modifier whenNotPaused() {
-        require(_paused == false, 'Contract is paused');
+        require(_paused == false, "Contract is paused");
         _;
     }
 
     modifier whenPaused() {
-        require(_paused == true, 'Contract is not paused');
+        require(_paused == true, "Contract is not paused");
         _;
     }
 
@@ -120,11 +120,8 @@ contract ERC165 {
 }
 
 contract ERC721 is Pausable, ERC165 {
-
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
-
     event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
-
     event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
     
     using SafeMath for uint256;
@@ -158,29 +155,32 @@ contract ERC721 is Pausable, ERC165 {
     }
 
     function balanceOf(address owner) public view returns (uint256) {
-        // TODO return the token balance of given address
+        // ✅ return the token balance of given address
         // TIP: remember the functions to use for Counters. you can refresh yourself with the link above
+        return _ownedTokensCount[owner].current();
     }
 
     function ownerOf(uint256 tokenId) public view returns (address) {
-        // TODO return the owner of the given tokenId
+        // ✅ return the owner of the given tokenId
+        return _tokenOwner[tokenId];
     }
 
-//    @dev Approves another address to transfer the given token ID
+    // @dev Approves another address to transfer the given token ID
     function approve(address to, uint256 tokenId) public {
-        
-        // TODO require the given address to not be the owner of the tokenId
-
-        // TODO require the msg sender to be the owner of the contract or isApprovedForAll() to be true
-
-        // TODO add 'to' address to token approvals
-
-        // TODO emit Approval Event
-
+        address tokenOwner = ownerOf(tokenId);
+        // ✅ require the given address to not be the owner of the tokenId
+        require(to != tokenOwner, "Cannot approve to yourself")
+        // ✅ require the msg sender to be the owner of the contract or isApprovedForAll() to be true
+        require(msg.sender == tokenOwner || isApprovedForAll(tokenOwner, msg.sender), "Caller is not authorized")
+        // ✅ add 'to' address to token approvals
+        _tokenApprovals[tokenId] = to;
+        // ✅ emit Approval Event
+        emit Approval(tokenOwner, to, tokenId);
     }
 
     function getApproved(uint256 tokenId) public view returns (address) {
-        // TODO return token approval if it exists
+        // ✅ return token approval if it exists
+        return _tokenApprovals[tokenId];
     }
 
     /**
@@ -245,18 +245,19 @@ contract ERC721 is Pausable, ERC165 {
     // @dev Internal function to mint a new token
     // TIP: remember the functions to use for Counters. you can refresh yourself with the link above
     function _mint(address to, uint256 tokenId) internal {
-
-        // TODO revert if given tokenId already exists or given address is invalid
-  
-        // TODO mint tokenId to given address & increase token count of owner
-
-        // TODO emit Transfer event
+        // ✅ revert if given tokenId already exists or given address is invalid
+        require(_tokenOwner[tokenId] == address(0), "Token exist already");
+        require(to != address(0), "Invalid address");
+        // ✅ mint tokenId to given address & increase token count of owner
+        _tokenOwner[tokenId] = to;
+        _ownedTokensCount[to].increment();
+        // ✅ emit Transfer event
+        emit Transfer(address(0), to, tokenId);
     }
 
     // @dev Internal function to transfer ownership of a given token ID to another address.
     // TIP: remember the functions to use for Counters. you can refresh yourself with the link above
     function _transferFrom(address from, address to, uint256 tokenId) internal {
-
         // TODO: require from address is the owner of the given token
 
         // TODO: require token is being transfered to valid address
