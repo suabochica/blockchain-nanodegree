@@ -41,7 +41,7 @@ contract('TestERC721Mintable', accounts => {
 
             currentOwner = account_two;
 
-            expect(await contractInstance.ownwer({ from: account_two })).to.equal(currentOwner);
+            expect(await contractInstance.owner({ from: account_two })).to.equal(currentOwner);
         });
 
         it('should not allow minting when the caller is not a contract owner', async function () {
@@ -56,112 +56,109 @@ contract('TestERC721Mintable', accounts => {
         beforeEach(async function () {
             contractInstance = await contractDefinition(name, symbol, { from: account_one)
         });
-    });
 
-    it('should not allow that an unauthorized address pause a contract', async function () {
-        await expectToRevert(
-            contractInstance.pause({ from: account_two }),
-            'Caller is not the contract owner and cannot pause the contract'
-        );
-    });
+        it('should not allow that an unauthorized address pause a contract', async function () {
+            await expectToRevert(
+                contractInstance.pause({ from: account_two }),
+                'Caller is not the contract owner and cannot pause the contract'
+            );
+        });
 
-    it('should not allow that an unauthorized address unpause a contract', async function () {
-        await expectToRevert(
-            contractInstance.unpause({ from: account_two }),
-            'Caller is not the contract owner and cannot unpause the contract'
-        );
-    });
+        it('should not allow that an unauthorized address unpause a contract', async function () {
+            await expectToRevert(
+                contractInstance.unpause({ from: account_two }),
+                'Caller is not the contract owner and cannot unpause the contract'
+            );
+        });
 
-    it('should allow that an owner pause a contract', async function () {
-        let transactionToPause = await contractInstance.pause({ from: account_one });
+        it('should allow that an owner pause a contract', async function () {
+            let transactionToPause = await contractInstance.pause({ from: account_one });
 
-        truffleAssert.eventEmitted(transactionToPause, 'Paused', (event) => {
-            return expect(event.account).to.deep.equal(account_one);
+            truffleAssert.eventEmitted(transactionToPause, 'Paused', (event) => {
+                return expect(event.account).to.deep.equal(account_one);
+            });
+        });
+
+        it('should not allow that an owner pause a contract when it is already paused', async function () {
+            await expectToRevert(
+                contractInstance.pause({ from: account_one }),
+                'Contract is paused'
+            );
+        });
+
+        it('should allow that an owner unpause a contract', async function () {
+            let transactionToUnpause = await contractInstance.pause({ from: account_one });
+
+            truffleAssert.eventEmitted(transactionToUnpause, 'Unpaused', (event) => {
+                return expect(event.account).to.deep.equal(account_one);
+            });
+        });
+
+        it('should not allow that an owner unpause a contract when it is already unpaused', async function () {
+            await expectToRevert(
+                contractInstance.unpause({ from: account_one }),
+                'Contract is unpaused'
+            );
+        });
+
+        it('should not allow minting when a contract is paused', async function () {
+            await contractInstance.pause({ from: account_one });
+
+            await expectToRevert(
+                contractInstance.mint(account_two, 12, { from: account_one }),
+                'Caller cannot mint b/c is the contract is paused'
+            );
         });
     });
 
-    it('should not allow that an owner pause a contract when it is already paused', async function () {
-        await expectToRevert(
-            contractInstance.pause({ from: account_one }),
-            'Contract is paused'
-        );
-    });
+    describe('ERC721Metadata Test Suite:', function () {
+        beforeEach(async function () {
+            contractInstance = await contractDefinition.new(name, symbol, { from: account_one });
+        });
 
-    it('should allow that an owner unpause a contract', async function () {
-        let transactionToUnpause = await contractInstance.pause({ from: account_one });
+        it('should return the token name', async function () {
+            expect(await contractInstance.name({ from: account_two })).to.equal(name);
+        });
 
-        truffleAssert.eventEmitted(transactionToUnpause, 'Unpaused', (event) => {
-            return expect(event.account).to.deep.equal(account_one);
+        it('should return the token symbol', async function () {
+            expect(await contractInstance.symbol({ from: account_two })).to.equal(symbol);
+        });
+
+        it('should return the token base uri', async function () {
+            expect(await contractInstance.baseTokenUri({ from: account_two })).to.equal(baseTokenUri);
         });
     });
 
-    it('should not allow that an owner unpause a contract when it is already unpaused', async function () {
-        await expectToRevert(
-            contractInstance.unpause({ from: account_one }),
-            'Contract is unpaused'
-        );
+    describe('ERC721Mintable Test Suite:', function () {
+        beforeEach(async function () {
+
+        });
+
+        it('should not mint an existing tokenId', async function () {
+
+        });
+
+        it('should not mint an zero address', async function () {
+
+        });
+
+        it('should return total supply', async function () {
+
+        });
+
+        it('should get token balance', async function () {
+
+        });
+
+        // token uri should be complete i.e: https://s3-us-west-2.amazonaws.com/udacity-blockchain/capstone/1
+        it('should return token uri', async function () {
+
+        });
+
+        it('should transfer token from one owner to another', async function () {
+
+        });
     });
-
-    it('should not allow minting when a contract is paused', async function () {
-        await contractInstance.pause({ from: account_one });
-
-        await expectToRevert(
-            contractInstance.mint(account_two, 12, { from: account_one }),
-            'Caller cannot mint b/c is the contract is paused'
-        );
-    });
-
-});
-
-describe('ERC721Metadata Test Suite:', function () {
-    beforeEach(async function () {
-
-    });
-
-    it('should return the token name', async function () {
-
-    });
-
-    it('should return the token symbol', async function () {
-
-    });
-
-    it('should return the token base uri', async function () {
-
-    });
-
-});
-
-describe('ERC721Mintable Test Suite:', function () {
-    beforeEach(async function () {
-
-    });
-
-    it('should not mint an existing tokenId', async function () {
-
-    });
-
-    it('should not mint an zero address', async function () {
-
-    });
-
-    it('should return total supply', async function () {
-
-    });
-
-    it('should get token balance', async function () {
-
-    });
-
-    // token uri should be complete i.e: https://s3-us-west-2.amazonaws.com/udacity-blockchain/capstone/1
-    it('should return token uri', async function () {
-
-    });
-
-    it('should transfer token from one owner to another', async function () {
-
-    });
-});
 });
 
 // Helpers
