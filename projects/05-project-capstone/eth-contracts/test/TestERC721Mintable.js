@@ -130,33 +130,122 @@ contract('TestERC721Mintable', accounts => {
     });
 
     describe('ERC721Mintable Test Suite:', function () {
-        beforeEach(async function () {
+        const tokensIds = [11, 22, 33, 44, 55, 66, 77, 88, 99, 101];
 
+        beforeEach(async function () {
+            contractInstance = await contractDefinition.new(name, symbol, { from: account_one });
+
+            for (let i = 0; i < tokensIds - 1; i++) {
+                await contractInstance.mint(accounts[i + 1], tokensIds[i], { from: account_one });
+            }
+
+            await contractInstance.mint(accounts[i + 1], tokensIds[tokensIds - 1], { from: account_one });
         });
 
         it('should not mint an existing tokenId', async function () {
-
+            await expectToRevert(
+                contractInstance.mint(accounts[8], tokensId[3]),
+                'Token already exist'
+            );
         });
 
         it('should not mint an zero address', async function () {
-
+            await expectToRevert(
+                contractInstance.mint(zeroAddress, 211),
+                'Invalid to address'
+            );
         });
 
         it('should return total supply', async function () {
+            const totalSupply = await contractInstance.totalSupply.call({ from: accounts[9] });
 
+            expect(Number(totalSupply)).to.equal(tokensIds.length);
         });
 
         it('should get token balance', async function () {
+            const thirdAccountBalance = await contractInstance.balanceOf(accounts[3]);
+            const ninthAccountBalance = await contractInstance.balanceOf(accounts[9]);
 
+            expect(Number(thirdAccountBalance)).to.equal(1);
+            expect(Number(ninthAccountBalance)).to.equal(2);
         });
 
         // token uri should be complete i.e: https://s3-us-west-2.amazonaws.com/udacity-blockchain/capstone/1
         it('should return token uri', async function () {
+            const token3Uri = await contractInstance.tokenURI(tokensIds[3]);
+            const token6Uri = await contractInstance.tokenURI(tokensIds[6]);
+            const token9Uri = await contractInstance.tokenURI(tokensIds[9]);
 
+            expect(token3Uri).to.deep.equal(`${baseTokenUri}${tokenIds[3]}`);
+            expect(token6Uri).to.deep.equal(`${baseTokenUri}${tokenIds[6]}`);
+            expect(token9Uri).to.deep.equal(`${baseTokenUri}${tokenIds[9]}`);
+        });
+
+
+        it('should return the ownerOf for a token properly', async function () {
+            expect(await contractInstance.ownerOf(34)).to.equal(zeroAddress);
+            expect(await contractInstance.ownerOf(tokensIds[4])).to.equal(accounts[5]);
+            expect(await contractInstance.ownerOf(tokensIds[8])).to.equal(accounts[9]);
+            expect(await contractInstance.ownerOf(tokensIds[4])).to.equal(accounts[9]);
+        });
+
+        it('should approve token from one owner to another user', async function () {
+            let transactionToApprove = await contractInstance.approve(
+                accounts[9],
+                accounts[7],
+                { from: accounts[8] }
+            );
+
+            truffleAssert.eventEmitted(
+                transactionToApprove,
+                'Approval',
+                (event) => {
+                    return expect(event.owner).to.deep.equal(accounts[8]) &&
+                        expect(event.approved).to.equal(accounts[9]) &&
+                        expect(Number(event.tokenId)).to.equal(tokensIds[7]);
+                }
+            );
+
+            let newApproved = await contractInstance.getApproved(tokensIds[7]);
+
+            expect(newApproved).to.equal(accounts[9]);
         });
 
         it('should transfer token from one owner to another', async function () {
+            let transactionToTransfer = await contractInstance.transferFrom(
+                accounts[8],
+                accounts[9],
+                accounts[7],
+                { from: accounts[9] }
+            );
 
+            truffleAssert.eventEmitted(
+                transactionToTransfer,
+                'Transfer',
+                (event) => {
+                    return expect(event.owner).to.deep.equal(accounts[8]) &&
+                        expect(event.approved).to.equal(accounts[9]) &&
+                        expect(Number(event.tokenId)).to.equal(tokensIds[7]);
+                }
+            );
+
+            expect(await contractInstance.ownerOf(tokensIds[7])).to.equal(accounts[8]);
+            expect(Number(await contractInstance.balanceOf(accounts[9]))).to.equal(2);
+            expect(Number(await contractInstance.balanceOf(accounts[8]))).to.equal(1);
+            expect(await contractInstance.getApproved(tokensIds[7])).to.equal(zeroAddress);
+        });
+
+        it('should not transfer to a zero address', async function () {
+            await expectToRevert(
+                contractInstance.transferFrom(
+                    accounts[8],
+                    zeroAddress,
+                    tokens[7],
+                    { from: accounts[8] },
+                    211
+                ),
+                'Invalid to zero address'
+            );
         });
     });
 });
