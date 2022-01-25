@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capstone</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Real Estate Marketplace</h1>
+        <p>Get the right property</p>
+    </div>
+
+    <div id="token-form">
+        <h2>Token View</h2>
+        <label for="contractOwner">Contract Owner</label>
+        <input type="text" name="contractOwner" id="contractOwner" value="0x0000000000000000000000000000000000000000"
+            size="50" disabled="true">
+        <br>
+        <label for="tokenId">Token Details</label>
+        <input type="text" name="tokenId" id="tokenId" placeholder="Insert token id" size="50">
+        <br>
+        <label for="tokenOwner">Token Owner</label>
+        <input type="text" name="tokenOwner" id="tokenOwner" value="0x0000000000000000000000000000000000000000"
+            size="50" disabled="true">
+        <br>
+        <label for="tokenURI">Token URI</label>
+        <input type="text" name="tokenURI" id="tokenURI" value="" size="50" disabled="true">
+        <br>
+        <label for="balanceOwner">Balance for Address</label>
+        <input type="text" name="balanceOwner" id="balanceOwner" placeholder="Insert an address" size="50">
+        <br>
+        <label for="tokenBalance">Token Balance</label>
+        <input type="text" name="tokenBalance" id="tokenBalance" value="" size="50" disabled="true">
+        <br>
+    </div>
+    <div class="buttons-container">
+        <button class="btn-fetch-one" type="button" data-id="0">Get Contract Owner</button>
+        <button class="btn-fetch-two" type="button" data-id="1">Get Token Details</button>
+        <button class="btn-fetch-three" type="button" data-id="2">Get Token Balance</button>
+    </div>
+
+    <div id="approve-form">
+        <h2>Approve Solution</h2>
+        <label for="proofA0">Proof A [0]</label>
+        <input type="text" name="proofA0" id="proofA0"
+            value="0xf0b673c6a8ce7211a1f48aac2d31f35aa474e8fc604b5209470c8c4204dcbb2" size="50"
+            placeholder="proof A [0]">
+    </div>
+    <hr>
+</body>
+
+</html>
