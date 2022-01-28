@@ -1,5 +1,7 @@
 pragma solidity ^0.5.0;
 
+// ✅ define a contract call to the zokrates generated solidity contract <Verifier> or <renamedVerifier>
+import "./Verifier.sol";
 import "./ERC721Mintable.sol";
 
 // ✅ define another contract named SolnSquareVerifier that inherits from your ERC721Mintable class
@@ -8,9 +10,8 @@ contract SolnSquareVerifier is ERC721Mintable {
 
     // ✅ define a solutions struct that can hold an index & an address
     struct Solution {
-        bool minted;
-        uint256 solutionIndex;
-        address solutionAddress;
+        uint256 index;
+        address solvedBy;
     }
 
     // ✅ define an array of the above struct
@@ -18,7 +19,7 @@ contract SolnSquareVerifier is ERC721Mintable {
     Solution[] private solutions;
 
     // ✅ define a mapping to store unique solutions submitted
-    mapping(bytes32 => Solution) solutions;
+    mapping(bytes32 => Solution) uniqueSolutions;
 
     // ✅ Create an event to emit when a solution is added
     event SolutionAdded(uint256 solutionIndex, address indexed solutionAddress);
@@ -91,19 +92,4 @@ contract SolnSquareVerifier is ERC721Mintable {
 
         return mint(to, tokenId);
     }
-}
-
-// ✅ define a contract call to the zokrates generated solidity contract <Verifier> or <renamedVerifier>
-contract Verifier {
-    function verifyTransaction(
-        uint256[2] memory A,
-        uint256[2] memory A_p,
-        uint256[2] memory B,
-        uint256[2] memory B_p,
-        uint256[2] memory C,
-        uint256[2] memory C_p,
-        uint256[2] memory H,
-        uint256[2] memory K,
-        uint256[2] memory input
-    ) public returns (bool response);
 }
