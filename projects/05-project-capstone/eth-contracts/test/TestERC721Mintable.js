@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
 const truffleAssert = require('truffle-assertions');
 
-const contractDefinition = artifacts.require('ERC721MintableComplete');
+const contractDefinition = artifacts.require('ERC721Mintable');
 
 contract('TestERC721Mintable', accounts => {
 
