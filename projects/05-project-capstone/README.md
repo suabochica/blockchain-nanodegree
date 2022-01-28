@@ -1,8 +1,45 @@
-# Udacity Blockchain Capstone
+# 🏋 Udacity Blockchain Capstone
 
 The capstone will build upon the knowledge you have gained in the course in order to build a decentralized housing product. 
 
-# Project Resources
+## ⚙️ Install
+
+This repository contains Smart Contract code in Solidity (using Truffle), tests (also using Truffle), dApp scaffolding (using HTML, CSS and JS) and server app scaffolding.
+
+To install, download or clone the repo, then:
+
+`npm install`
+`truffle compile`
+
+## 👨‍💻 Develop Client
+
+To run truffle tests:
+
+`truffle test ./eth-contracts/test/TestERC721Mintable.js`
+
+To use the dapp:
+
+`truffle migrate`
+`npm run dapp`
+
+To view dapp:
+
+`http://localhost:8000`
+
+## 🗄️ Develop Server
+
+`npm run server`
+`truffle test ./test/oracles.js`
+
+## 🚀 Deploy
+
+To build dapp for prod:
+`npm run app:prod`
+
+Deploy the contents of the ./dapp folder
+
+
+## 🧭 Resources
 
 * [Remix - Solidity IDE](https://remix.ethereum.org/)
 * [Visual Studio Code](https://code.visualstudio.com/)

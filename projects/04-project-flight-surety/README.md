@@ -1,4 +1,4 @@
-# 🏋️ Fligh tSurety
+# 🏋️ Flight Surety
 
 FlightSurety is a sample application project for Udacity's Blockchain course.
 
@@ -39,7 +39,7 @@ To build dapp for prod:
 
 Deploy the contents of the ./dapp folder
 
-## Resources
+## 🧭 Resources
 
 * [How does Ethereum work anyway?](https://medium.com/@preethikasireddy/how-does-ethereum-work-anyway-22d1df506369)
 * [BIP39 Mnemonic Generator](https://iancoleman.io/bip39/)
