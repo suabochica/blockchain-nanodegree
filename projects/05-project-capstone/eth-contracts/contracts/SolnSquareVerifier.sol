@@ -15,7 +15,7 @@ contract SolnSquareVerifier is ERC721Mintable {
 
     // ✅ define an array of the above struct
     uint256 numberOfSolutions = 0;
-    // Solution[] private solutions;
+    Solution[] private solutions;
 
     // ✅ define a mapping to store unique solutions submitted
     mapping(bytes32 => Solution) solutions;
@@ -23,82 +23,73 @@ contract SolnSquareVerifier is ERC721Mintable {
     // ✅ Create an event to emit when a solution is added
     event SolutionAdded(uint256 solutionIndex, address indexed solutionAddress);
 
-    constructor(
-        address verifierAddress,
-        string memory name,
-        string memory symbol
-    ) public ERC721Mintable(name, symbol) {
-        verifierContract = Verifier(verifierAddress);
+    constructor(address verifierContractAddress) public {
+        verifierContract = Verifier(verifierContractAddress);
+    }
+
+    function hash(
+        uint256[2] memory a,
+        uint256[2] memory a_p,
+        uint256[2][2] memory b,
+        uint256[2] memory b_p,
+        uint256[2] memory c,
+        uint256[2] memory c_p,
+        uint256[2] memory h,
+        uint256[2] memory k,
+        uint256[2] memory input
+    ) public pure returns (bytes32) {
+        return keccak256(abi.encodePacked(a, a_p, b, b_p, c, c_p, h, k, input));
     }
 
     // ✅ Create a function to add the solutions to the array and emit the event
     function addSolution(
-        uint256[2] memory A,
-        uint256[2] memory A_p,
-        uint256[2] memory B,
-        uint256[2] memory B_p,
-        uint256[2] memory C,
-        uint256[2] memory C_p,
-        uint256[2] memory H,
-        uint256[2] memory K,
-        uint256[2] memory input
+        uint256 index,
+        address solvedBy,
+        bytes32 solutionHash
     ) public {
-        bytes32 solutionHash = keccak256(abi.encodePacked(input[0], input[1]));
-        require(
-            solutions[solutionHash].solutionAddress == address(0),
-            "Solution address already exists"
-        );
+        Solution memory solution = Solution(index, solvedBy);
+        solutions.push(solution);
+        uniqueSolutions[solutionHash] = solution;
 
-        bool verified = verifierContract.verifyTransaction(
-            A,
-            A_p,
-            B,
-            B_p,
-            C,
-            C_p,
-            H,
-            K,
-            input
-        );
-        require(verified, "Solution could not be verified");
-
-        solutions[solutionHash] = Solution(
-            false,
-            numberOfSolutions,
-            msg.sender
-        );
-        // solutions.push(solution);
-
-        emit SolutionAdded(numberOfSolutions, msg.sender);
-        numberOfSolutions++;
+        emit SolutionAdded(index, solvedBy);
     }
 
     // ✅ Create a function to mint new NFT only after the solution has been verified
     //  - make sure the solution is unique (has not been used before)
     //  - make sure you handle metadata as well as tokenSuplly
-    function mintNewNFT(
-        uint256 a,
-        uint256 b,
-        address to
-    ) public {
-        bytes32 solutionHash = keccak256(abi.encodePacked(a, b));
-
-        require(
-            solutions[solutionHash].solutionAddress != address(0),
-            "Solution address already exists"
+    function mintNewToken(
+        address to,
+        uint256 tokenId,
+        uint256[2] memory a,
+        uint256[2] memory a_p,
+        uint256[2][2] memory b,
+        uint256[2] memory b_p,
+        uint256[2] memory c,
+        uint256[2] memory c_p,
+        uint256[2] memory h,
+        uint256[2] memory k,
+        uint256[2] memory input
+    ) public returns (bool) {
+        bytes32 solutionHash = hash(a, a_p, b, b_p, c, c_p, h, k, input);
+        bool verified = verifierContract.verifyTx(
+            a,
+            a_p,
+            b,
+            b_p,
+            c,
+            c_p,
+            h,
+            k,
+            input
         );
+        require(verified, "Solution not verified (zero Knowledge Proof check)");
         require(
-            solutions[solutionHash].solutionAddress != msg.sender,
-            "Only solution address can be use to mint a token"
+            uniqueSolutions[solutionHash].solvedBy == address(0),
+            "Solution has already been used before"
         );
-        require(
-            solutions[solutionHash].minted != false,
-            "Token is already minted"
-        );
+        addSolution(tokenId, to, solutionHash);
 
-        super.mint(to, solutions[solutionHash].solutionIndex);
-
-        solutions[solutionHash].minted = true;
+        return mint(to, tokenId);
     }
 }
 
