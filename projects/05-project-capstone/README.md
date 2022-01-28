@@ -20,16 +20,11 @@ To run truffle tests:
 To use the dapp:
 
 `truffle migrate`
-`npm run dapp`
+`npm run app`
 
 To view dapp:
 
 `http://localhost:8000`
-
-## 🗄️ Develop Server
-
-`npm run server`
-`truffle test ./test/oracles.js`
 
 ## 🚀 Deploy
 
@@ -38,6 +33,73 @@ To build dapp for prod:
 
 Deploy the contents of the ./dapp folder
 
+## 🕹️ Zokrates
+
+Run the zokrates docker image:
+
+```
+docker run -v ~/Development/blockchain-nanodegree/projects/05-project-capstone/zokrates/code:/home/zokrates/code -ti zokrates/zokrates /bin/bash
+```
+
+Compile the program
+
+```
+zokrates compile -i code/square/square.code
+```
+
+Generate the trusted zokrates setup
+
+```
+zokrates setup
+```
+
+Compute the witness for your desired pair of numbers under the format `number square` (e.g 3 9)
+
+```
+zokrates compute-witness -a 3 9
+```
+
+Generate the proof:
+
+```
+zokrates generate-proof
+```
+
+At this point there should be a `proof.json` file that contains `ProofA[]`, `ProofB[]` fields that can be used in the approve solution.
+
+If you want, generate the ~Verifier.sol~ contract with:
+
+```
+zokrates export-verifier
+```
+## 🕹️ ABI
+
+Below I share the generated `abi.json`
+
+```
+{
+  "inputs": [
+    {
+      "name": "a",
+      "public": false,
+      "type": "field"
+    },
+    {
+      "name": "b",
+      "public": true,
+      "type": "field"
+    }
+  ],
+  "outputs": [
+    {
+      "type": "field"
+    }
+  ]
+}
+
+```
+
+## 🌊 OpenSea
 
 ## 🧭 Resources
 
