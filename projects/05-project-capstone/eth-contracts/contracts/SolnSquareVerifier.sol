@@ -1,9 +1,9 @@
-pragma solidity >=0.4.21 <0.6.0;
+pragma solidity ^0.5.0;
 
-import "./ERC721MintableComplete.sol";
+import "./ERC721Mintable.sol";
 
 // ✅ define another contract named SolnSquareVerifier that inherits from your ERC721Mintable class
-contract SolnSquareVerifier is ERC721MintableComplete {
+contract SolnSquareVerifier is ERC721Mintable {
     Verifier private verifierContract;
 
     // ✅ define a solutions struct that can hold an index & an address
@@ -14,11 +14,11 @@ contract SolnSquareVerifier is ERC721MintableComplete {
     }
 
     // ✅ define an array of the above struct
-    uint256 numberOfSolutions;
-    Solution[] private solutions;
+    uint256 numberOfSolutions = 0;
+    // Solution[] private solutions;
 
     // ✅ define a mapping to store unique solutions submitted
-    mapping(bytes => Solution) solutions;
+    mapping(bytes32 => Solution) solutions;
 
     // ✅ Create an event to emit when a solution is added
     event SolutionAdded(uint256 solutionIndex, address indexed solutionAddress);
@@ -27,7 +27,7 @@ contract SolnSquareVerifier is ERC721MintableComplete {
         address verifierAddress,
         string memory name,
         string memory symbol
-    ) public ERC721MintableComplete(name, symbol) {
+    ) public ERC721Mintable(name, symbol) {
         verifierContract = Verifier(verifierAddress);
     }
 
@@ -63,11 +63,11 @@ contract SolnSquareVerifier is ERC721MintableComplete {
         require(verified, "Solution could not be verified");
 
         solutions[solutionHash] = Solution(
+            false,
             numberOfSolutions,
-            msg.sender,
-            false
+            msg.sender
         );
-        solutions.push(solution);
+        // solutions.push(solution);
 
         emit SolutionAdded(numberOfSolutions, msg.sender);
         numberOfSolutions++;
@@ -84,15 +84,15 @@ contract SolnSquareVerifier is ERC721MintableComplete {
         bytes32 solutionHash = keccak256(abi.encodePacked(a, b));
 
         require(
-            soutions[solutionHash].solutionAddress != address(0),
+            solutions[solutionHash].solutionAddress != address(0),
             "Solution address already exists"
         );
         require(
-            soutions[solutionHash].solutionAddress != msg.sender,
+            solutions[solutionHash].solutionAddress != msg.sender,
             "Only solution address can be use to mint a token"
         );
         require(
-            soutions[solutionHash].minted != false,
+            solutions[solutionHash].minted != false,
             "Token is already minted"
         );
 
