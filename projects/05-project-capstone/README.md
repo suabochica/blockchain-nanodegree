@@ -101,6 +101,14 @@ Below I share the generated `abi.json`
 
 ## 🌊 OpenSea
 
+```
+Wallet address:
+0xe4fea204e68ba4f91fc6014fa712132086255ca4
+
+Nonce:
+861475
+```
+
 ## 🧭 Resources
 
 * [Remix - Solidity IDE](https://remix.ethereum.org/)
