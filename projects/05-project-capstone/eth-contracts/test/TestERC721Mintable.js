@@ -54,7 +54,7 @@ contract('TestERC721Mintable', accounts => {
 
     describe('Pauseable Test Suite:', function () {
         beforeEach(async function () {
-            contractInstance = await contractDefinition(name, symbol, { from: account_one)
+            contractInstance = await contractDefinition(name, symbol, { from: account_one });
         });
 
         it('should not allow that an unauthorized address pause a contract', async function () {

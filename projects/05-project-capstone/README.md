@@ -6,10 +6,23 @@ The capstone will build upon the knowledge you have gained in the course in orde
 
 This repository contains Smart Contract code in Solidity (using Truffle), tests (also using Truffle), dApp scaffolding (using HTML, CSS and JS) and server app scaffolding.
 
-To install, download or clone the repo, then:
+To install, download or clone the repo, and execute the next steps:
+
+Install dependencies:
 
 `npm install`
+
+Compile the contract:
+
 `truffle compile`
+
+Start Ganache
+
+`ganache-cli`
+
+In other terminal run:
+
+`truffle test`
 
 ## 👨‍💻 Develop Client
 
@@ -38,31 +51,33 @@ Deploy the contents of the ./dapp folder
 Run the zokrates docker image:
 
 ```
-docker run -v ~/Development/blockchain-nanodegree/projects/05-project-capstone/zokrates/code:/home/zokrates/code -ti zokrates/zokrates /bin/bash
+docker run -v ~/Development/blockchain-nanodegree/projects/05-project-capstone/zokrates/code:/home/zokrates/code -ti zokrates/zokrates:0.3.0 /bin/bash
 ```
+> Note: use the version `0.3.0` of zokrates generates the expected outputs
 
 Compile the program
 
 ```
-zokrates compile -i code/square/square.code
+cd code
+~/zokrates compile -i square/square.code
 ```
 
 Generate the trusted zokrates setup
 
 ```
-zokrates setup
+~/zokrates setup
 ```
 
 Compute the witness for your desired pair of numbers under the format `number square` (e.g 3 9)
 
 ```
-zokrates compute-witness -a 3 9
+~/zokrates compute-witness -a 3 9
 ```
 
 Generate the proof:
 
 ```
-zokrates generate-proof
+~/zokrates generate-proof
 ```
 
 At this point there should be a `proof.json` file that contains `ProofA[]`, `ProofB[]` fields that can be used in the approve solution.
@@ -70,7 +85,7 @@ At this point there should be a `proof.json` file that contains `ProofA[]`, `Pro
 If you want, generate the ~Verifier.sol~ contract with:
 
 ```
-zokrates export-verifier
+~/zokrates export-verifier
 ```
 ## 🕹️ ABI
 
@@ -974,6 +989,8 @@ Nonce:
 861475
 ```
 
+[EtherScan](https://rinkeby.etherscan.io/address/0xe4fea204e68ba4f91fc6014fa712132086255ca4)
+
 NFT links:
 
 - [Water House](https://testnets.opensea.io/assets/0x88b48f654c30e99bc2e4a1559b4dcf1ad93fa656/103577226846465686377519928044988398376835694479848581002288206161382146572289/)
@@ -987,6 +1004,8 @@ NFT links:
 I can't purchased my NFTs in Open Sea because when I try to get ETH in my metamask account from [faucet rinkeby](https://faucet.rinkeby.io/) via this [facebook post](https://www.facebook.com/sergiokun.benitez/posts/10165966092110623) I got the next error:
 
 ![No Ethereum address found to fund](./src/app/assets/no_eth_address_found.png)
+
+> Solution: get test funds form [faucets chain](https://faucets.chain.link/rinkeby)
 
 ## 🧭 Resources
 

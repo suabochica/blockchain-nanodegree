@@ -13,11 +13,14 @@
   "author": "Sergio Benítez",
   "license": "MIT",
   "devDependencies": {
-    "lite-server": "2.4.0"
+    "lite-server": "2.4.0",
+    "truffle-assertions": "^0.8.2",
+    "web3": "^1.0.0-beta.52"
   },
   "dependencies": {
     "openzeppelin-solidity": "^2.2.0",
     "solc": "^0.5.2",
-    "solc-js": "^0.5.2"
+    "solc-js": "^0.5.2",
+    "truffle-hdwallet-provider": "^1.0.6"
   }
 }
