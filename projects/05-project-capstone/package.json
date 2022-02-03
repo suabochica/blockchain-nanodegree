@@ -5,9 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "lite-server",
-    "test": "truffle test ./eth-contracts/test/TestERC721Mintable.js",
-    "app": "webpack-dev-server --mode development --config webpack.config.app.js",
-    "app:prod": "webpack --mode production  --config webpack.config.app.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "Sergio Benítez",
