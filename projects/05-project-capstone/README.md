@@ -1007,6 +1007,41 @@ I can't purchased my NFTs in Open Sea because when I try to get ETH in my metama
 
 > Solution: get test funds form [faucets chain](https://faucets.chain.link/rinkeby)
 
+When run the command to check the test
+
+```
+truffle test
+```
+
+I got the next error:
+
+```
+❯ truffle test ./test/TestSquareVerifier.js 
+Using network 'development'.
+
+
+Compiling your contracts...
+===========================
+> Everything is up to date, there is nothing to compile.
+
+Error: 
+    at Deployer._preFlightCheck (/home/suabochica/.nvm/versions/node/v14.15.4/lib/node_modules/truffle/build/webpack:/packages/deployer/src/deployment.js:179:1)
+    at processTicksAndRejections (internal/process/task_queues.js:93:5)
+    at /home/suabochica/.nvm/versions/node/v14.15.4/lib/node_modules/truffle/build/webpack:/packages/deployer/src/deployment.js:282:1
+    at Migration._deploy (/home/suabochica/.nvm/versions/node/v14.15.4/lib/node_modules/truffle/build/webpack:/packages/migrate/Migration.js:70:1)
+    at Migration._load (/home/suabochica/.nvm/versions/node/v14.15.4/lib/node_modules/truffle/build/webpack:/packages/migrate/Migration.js:56:1)
+    at Migration.run (/home/suabochica/.nvm/versions/node/v14.15.4/lib/node_modules/truffle/build/webpack:/packages/migrate/Migration.js:217:1)
+    at Object.runMigrations (/home/suabochica/.nvm/versions/node/v14.15.4/lib/node_modules/truffle/build/webpack:/packages/migrate/index.js:150:1)
+    at Object.runFrom (/home/suabochica/.nvm/versions/node/v14.15.4/lib/node_modules/truffle/build/webpack:/packages/migrate/index.js:110:1)
+    at Object.runAll (/home/suabochica/.nvm/versions/node/v14.15.4/lib/node_modules/truffle/build/webpack:/packages/migrate/index.js:114:1)
+    at Object.run (/home/suabochica/.nvm/versions/node/v14.15.4/lib/node_modules/truffle/build/webpack:/packages/migrate/index.js:79:1)
+    at Object.run (/home/suabochica/.nvm/versions/node/v14.15.4/lib/node_modules/truffle/build/webpack:/packages/core/lib/testing/Test.js:114:1)
+    at Object.run (/home/suabochica/.nvm/versions/node/v14.15.4/lib/node_modules/truffle/build/webpack:/packages/core/lib/commands/test/index.js:182:1)
+    at Command.run (/home/suabochica/.nvm/versions/node/v14.15.4/lib/node_modules/truffle/build/webpack:/packages/core/lib/command.js:183:1)
+Truffle v5.4.23 (core: 5.4.23)
+Node v14.15.4
+```
+
 ## 🧭 Resources
 
 * [Remix - Solidity IDE](https://remix.ethereum.org/)
