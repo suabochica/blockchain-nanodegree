@@ -1,75 +1,88 @@
 // Test if a new solution can be added for contract - SolnSquareVerifier
-const SolnSquareVerifier = artifacts.require("SolnSquareVerifier");
-const Verifier = artifacts.require('Verifier');
+const SolnSquareVerifier = artifacts.require('SolnSquareVerifier');
+const proof = require('./../zokrates/code/square/proof.json');
 const truffleAssert = require('truffle-assertions');
 
 contract('SolnSquareVerifier', accounts => {
-    const { proof, input } = require('../../zokrates/code/square/proof.json')
 
-    beforeEach(async () => {
-        const verifierContract = await Verifier.new({ from: accounts[0] })
-        this.contract = await SolnSquareVerifier.new(
-            verifierContract.address,
-            { from: accounts[0] }
-        )
-    })
+    const owner = accounts[0];
+    const accountOne = accounts[1];
 
-    // Test if a new solution can be added for contract - SolnSquareVerifier
-    it('Can add new solution for contract', async () => {
-        const hash = await this.contract.hash.call(
-            proof.A,
-            proof.A_p,
-            proof.B,
-            proof.B_p,
-            proof.C,
-            proof.C_p,
-            proof.H,
-            proof.K,
-            input
-        )
-        const tx = await this.contract.addSolution(
-            1,
-            accounts[1],
-            hash
-        )
-        truffleAssert.eventEmitted(
-            tx,
-            'SolutionAdded',
-            ev => {
-                return +ev.index == 1 &
-                    ev.solvedBy === accounts[1]
-            },
-            'SolutionAdded event should have been emitted'
-        )
-    })
+    describe('Verified Minting', async () => {
 
-    // Test if an ERC721 token can be minted for contract - SolnSquareVerifier
-    it('Can mint token', async () => {
-        const tx = await this.contract.mintNewToken(
-            accounts[1],
-            2,
-            proof.A,
-            proof.A_p,
-            proof.B,
-            proof.B_p,
-            proof.C,
-            proof.C_p,
-            proof.H,
-            proof.K,
-            input,
-            { from: accounts[0] }
-        )
-        assert(tx, 'No token minted')
+        beforeEach(async () => {
+            this.contract = await SolnSquareVerifier.new({ from: owner });
+        });
 
-        truffleAssert.eventEmitted(
-            tx,
-            'Transfer',
-            ev => {
-                return ev.from === accounts[0] &
-                    ev.to === accounts[1] &
-                    +ev.tokenId == 2
-            },
-            'Transfer event should have been emitted'
-        )
-    })
-})
+        it('can add a new solution', async () => {
+            let result = false;
+            let tx = await this.contract.mintVerify(
+                accountOne,
+                1,
+                proof.proof.a,
+                proof.proof.b,
+                proof.proof.c,
+                proof.inputs,
+                { from: owner }
+            );
+
+            truffleAssert.eventEmitted(tx, 'SolutionAdded', () => {
+                result = true;
+                return true;
+            });
+
+            assert.equal(result, true, "SolutionAdded event was not emitted");
+        });
+
+        it('can mint a new token', async () => {
+            await this.contract.mint(accountOne, 1, { from: owner });
+            let tokenBalance = await this.contract.balanceOf.call(accountOne);
+            assert.equal(tokenBalance, 1, "Token balance does not match");
+        });
+
+        it('will not mint a new token with duplicate solution', async () => {
+            let result = true;
+            await this.contract.mintVerify(
+                accountOne,
+                1,
+                proof.proof.a,
+                proof.proof.b,
+                proof.proof.c,
+                proof.inputs,
+                { from: owner }
+            );
+            try {
+                await this.contract.mintVerify(
+                    accountOne,
+                    2,
+                    proof.proof.a,
+                    proof.proof.b,
+                    proof.proof.c,
+                    proof.inputs,
+                    { from: owner }
+                );
+            } catch (e) {
+                result = false;
+            }
+            assert.equal(result, false, "New token minted with duplicate solution");
+        });
+
+        it('will not mint a new token with bad verification', async () => {
+            let result = true;
+            try {
+                await this.contract.mintVerify(
+                    accountOne,
+                    1,
+                    proof.proof.a,
+                    proof.proof.b,
+                    proof.proof.c,
+                    [6, 9],
+                    { from: owner }
+                );
+            } catch (e) {
+                result = false;
+            }
+            assert.equal(result, false, "New token minted with bad verification");
+        });
+    });
+});
