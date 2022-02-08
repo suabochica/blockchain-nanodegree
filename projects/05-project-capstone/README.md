@@ -50,10 +50,10 @@ Below is shared **Verifier** and **SolnSquareVerifier** addresses:
 
    Deploying 'Verifier'
    --------------------
-undefined
    > block number:        10119848
    > block timestamp:     1644120064
    > account:             0xE4feA204E68Ba4F91FC6014fA712132086255CA4
+   > address:             0xe858286C7DFD3d03Fe1A790f8917D5BB271E6e48
    > balance:             0.196838112491146715
    > gas used:            992455 (0xf24c7)
    > gas price:           2.500000007 gwei
@@ -63,10 +63,10 @@ undefined
 
    Deploying 'SolnSquareVerifier'
    ------------------------------
-undefined
    > block number:        10119849
    > block timestamp:     1644120068
    > account:             0xE4feA204E68Ba4F91FC6014fA712132086255CA4
+   > address:             0xD706d4cD4f46111eFAb5564586CF162e6b288450
    > balance:             0.186253327461509317
    > gas used:            4233914 (0x409aba)
    > gas price:           2.500000007 gwei
@@ -131,7 +131,7 @@ You can check the abis in the `/build` folder.
 
 ```
 Owner Wallet Address:
-0xe4fea204e68ba4f91fc6014fa712132086255ca4
+0xE4feA204E68Ba4F91FC6014fA712132086255CA4
 
 Buyer Wallet Address:
 0x53FECf832d291F0C3d43f06E3BE1a459adE7b1f2
